@@ -2121,8 +2121,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 400\", function () {\r",
-									"     pm.expect(pm.response.code).to.be.equal(400);\r",
+									"pm.test(\"Status code is 404\", function () {\r",
+									"     pm.expect(pm.response.code).to.be.equal(404);\r",
 									"});\r",
 									"pm.test(\"Has error response\", function () {\r",
 									"    pm.response.to.be.withBody;\r",
@@ -2175,8 +2175,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 400\", function () {\r",
-									"     pm.expect(pm.response.code).to.be.equal(400);\r",
+									"pm.test(\"Status code is 404\", function () {\r",
+									"     pm.expect(pm.response.code).to.be.equal(404);\r",
 									"});\r",
 									"pm.test(\"Has error response\", function () {\r",
 									"    pm.response.to.be.withBody;\r",
