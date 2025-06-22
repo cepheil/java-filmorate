@@ -32,7 +32,7 @@ public class UserController {
      * @return коллекция пользователей в порядке возрастания ID.
      */
     @GetMapping
-    public Collection<User> findAll() {
+    public Collection<User> findAllUsers() {
         log.info("GET /users - получение списка всех пользователей");
         return users.values()
                 .stream()
@@ -48,8 +48,8 @@ public class UserController {
      * @throws ValidationException если данные пользователя не проходят валидацию.
      */
     @PostMapping
-    public User create(@Valid @RequestBody User user) {
-        log.info("POST /users - попытка создания пользователя: {}", user);
+    public User createUser(@Valid @RequestBody User user) {
+        log.info("POST /users - попытка создания пользователя: {}", user.getEmail());
         try {
             if (users.values().stream().anyMatch(u -> u.getEmail().equals(user.getEmail()))) {
                 throw new DuplicatedDataException("Email уже используется");
@@ -81,8 +81,8 @@ public class UserController {
      * @throws ValidationException если данные не проходят валидацию.
      */
     @PutMapping
-    public User update(@Valid @RequestBody User newUser) {
-        log.info("PUT /users - попытка обновления пользователя: {}", newUser);
+    public User updateUser(@Valid @RequestBody User newUser) {
+        log.info("PUT /users - попытка обновления пользователя: {}", newUser.getEmail());
         try {
             User existingUser = users.get(newUser.getId());
             if (existingUser == null) {
