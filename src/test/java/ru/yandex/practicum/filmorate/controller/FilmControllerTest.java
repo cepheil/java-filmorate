@@ -25,6 +25,7 @@ public class FilmControllerTest {
      */
     @Test
     public void testCreateFilmWithEmptyNameShouldReturnError() throws Exception {
+        // CHECKSTYLE:OFF
         String json = """
                     {
                         "name": "",
@@ -33,6 +34,7 @@ public class FilmControllerTest {
                         "duration": 120
                     }
                 """;
+        // CHECKSTYLE:ON
         mockMvc.perform(post("/films").contentType("application/json").content(json))
                 .andExpect(status().isBadRequest());
     }
@@ -43,6 +45,7 @@ public class FilmControllerTest {
      */
     @Test
     public void testCreateFilmWithInvalidReleaseDateShouldReturnError() throws Exception {
+        // CHECKSTYLE:OFF
         String json = """
             {
                 "name": "Test Film",
@@ -51,6 +54,7 @@ public class FilmControllerTest {
                 "duration": 120
             }
         """;
+        // CHECKSTYLE:ON
         mockMvc.perform(post("/films").contentType("application/json").content(json))
                 .andExpect(status().isBadRequest());
     }
@@ -61,6 +65,7 @@ public class FilmControllerTest {
      */
     @Test
     public void testCreateFilmWithDescriptionTooLongShouldReturnError() throws Exception {
+        // CHECKSTYLE:OFF
         String json = """
         {
             "name": "Valid Test Film",
@@ -68,8 +73,8 @@ public class FilmControllerTest {
             "releaseDate": "2000-01-01",
             "duration": 120
         }
-    """.formatted("d".repeat(201)); // 201 символ — превышает лимит
-
+    """.formatted("d".repeat(201));
+        // CHECKSTYLE:ON
         mockMvc.perform(post("/films")
                         .contentType("application/json")
                         .content(json))
@@ -82,6 +87,7 @@ public class FilmControllerTest {
      */
     @Test
     public void testCreateFilmWithDurationZeroShouldReturnError() throws Exception {
+        // CHECKSTYLE:OFF
         String json = """
         {
             "name": "Valid Test Film",
@@ -90,7 +96,7 @@ public class FilmControllerTest {
             "duration": 0
         }
     """;
-
+        // CHECKSTYLE:ON
         mockMvc.perform(post("/films")
                         .contentType("application/json")
                         .content(json))
@@ -103,6 +109,7 @@ public class FilmControllerTest {
      */
     @Test
     public void testCreateFilmWithFutureReleaseDateShouldReturnError() throws Exception {
+        // CHECKSTYLE:OFF
         String json = """
         {
             "name": "Valid Test Film",
@@ -111,7 +118,7 @@ public class FilmControllerTest {
             "duration": 120
         }
     """;
-
+        // CHECKSTYLE:ON
         mockMvc.perform(post("/films")
                         .contentType("application/json")
                         .content(json))
@@ -136,6 +143,7 @@ public class FilmControllerTest {
      */
     @Test
     public void testCreateFilmWithValidDataShouldReturnSuccess() throws Exception {
+        // CHECKSTYLE:OFF
         String json = """
         {
             "name": "Valid Test Film",
@@ -144,7 +152,7 @@ public class FilmControllerTest {
             "duration": 148
         }
     """;
-
+        // CHECKSTYLE:ON
         mockMvc.perform(post("/films")
                         .contentType("application/json")
                         .content(json))
