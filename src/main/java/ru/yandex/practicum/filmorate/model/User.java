@@ -5,6 +5,10 @@ import lombok.Data;
 
 import java.time.LocalDate;
 
+/**
+ * Класс, представляющий модель пользователя.
+ * Содержит информацию о пользователе, включая имя, email, логин и дату рождения.
+ */
 @Data
 public class User {
     private Long id;
