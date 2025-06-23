@@ -16,6 +16,10 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
+/**
+ * Контроллер для управления фильмами.
+ * Обеспечение получения, создания и обновления списка фильмов.
+ */
 @Slf4j
 @RestController
 @RequestMapping("/films")
@@ -25,6 +29,10 @@ public class FilmController {
     private final AtomicLong idCounter = new AtomicLong(1);
     private static final LocalDate CINEMA_BIRTHDAY = LocalDate.of(1895, 12, 28);
 
+    /**
+     * Возвращение списка всех фильмов, отсортированных по ID.
+     * @return коллекция фильмов в порядке возрастания ID.
+     */
     @GetMapping
     public Collection<Film> findAllFilms() {
         log.info("GET /films - получение списка всех фильмов");
@@ -34,6 +42,13 @@ public class FilmController {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Создание нового фильма.
+     * Валидация данных фильма.
+     * @param film данные фильма для создания.
+     * @return созданный фильм с присвоенным ID.
+     * @throws ValidationException если данные фильма не проходят валидацию.
+     */
     @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) {
         log.info("POST /films - попытка добавления фильма: {}", film.getName());
@@ -56,6 +71,15 @@ public class FilmController {
         }
     }
 
+    /**
+     * Обновление данных существующего фильма.
+     * Проверка, что фильм существует и название не дублируется.
+     * @param newFilm новые данные фильма.
+     * @return обновленный фильм.
+     * @throws NotFoundException если фильм с указанным ID не найден.
+     * @throws DuplicatedDataException если новое название уже используется.
+     * @throws ValidationException если данные не проходят валидацию.
+     */
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film newFilm) {
         log.info("PUT /films - попытка обновления фильма {}", newFilm.getName());
@@ -81,7 +105,11 @@ public class FilmController {
         }
     }
 
-
+    /**
+     * Генерация следующего ID для нового фильма.
+     * Поиск максимально-существующего ID и увеличение его на 1.
+     * @return следующий доступный ID.
+     */
     private long getNextId() {
         return idCounter.getAndIncrement();
     }
