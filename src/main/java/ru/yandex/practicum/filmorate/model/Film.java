@@ -6,6 +6,10 @@ import ru.yandex.practicum.filmorate.annotation.MinReleaseDate;
 
 import java.time.LocalDate;
 
+/**
+ * Класс, представляющий модель фильма.
+ * Содержит информацию о фильме, включая его название, описание, дату релиза и продолжительность.
+ */
 @Data
 public class Film {
     private Long id;
