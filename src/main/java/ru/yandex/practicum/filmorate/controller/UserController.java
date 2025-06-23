@@ -52,10 +52,16 @@ public class UserController {
         log.info("POST /users - попытка создания пользователя: {}", user.getEmail());
         try {
             if (users.values().stream().anyMatch(u -> u.getEmail().equalsIgnoreCase(user.getEmail()))) {
+                log.error("Такой email уже существует: {}", user.getEmail());
                 throw new DuplicatedDataException("Email уже используется");
             }
             if (users.containsKey(user.getId())) {
+                log.error("Такой ID уже существует: {}", user.getId());
                 throw new DuplicatedDataException("Пользователь с таким ID уже существует");
+            }
+            if (user.getLogin().contains(" ")) {
+                log.error("Логин содержит пробелы: {}", user.getLogin());
+                throw new ValidationException("Логин не может содержать пробелы");
             }
             user.setId(getNextId());
             if (user.getName() == null || user.getName().isBlank()) {
@@ -86,13 +92,12 @@ public class UserController {
         try {
             User existingUser = users.get(newUser.getId());
             if (existingUser == null) {
+                log.error("Отсутствует ID: {}", newUser.getId());
                 throw new NotFoundException("Пользователь с ID " + newUser.getId() + " не найден");
             }
-            if (users.values()
-                    .stream()
-                    .anyMatch(user -> !user.getId().equals(newUser.getId())
-                    && user.getEmail().equalsIgnoreCase(newUser.getEmail()))) {
-                throw new DuplicatedDataException("Этот имейл уже используется");
+            if (!newUser.getEmail().equals(existingUser.getEmail())
+                    && users.values().stream().anyMatch(user -> user.getEmail().equals(newUser.getEmail()))) {
+                throw new DuplicatedDataException("Email уже используется");
             }
             existingUser.setEmail(newUser.getEmail());
             existingUser.setLogin(newUser.getLogin());
