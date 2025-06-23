@@ -25,6 +25,7 @@ public class UserControllerTest {
      */
     @Test
     public void testCreateUserWithEmailNullShouldReturnError() throws Exception {
+        // CHECKSTYLE:OFF
         String json = """
             {
                 "email": "null",
@@ -32,6 +33,7 @@ public class UserControllerTest {
                 "birthday": "2000-01-01"
             }
         """;
+        // CHECKSTYLE:ON
         mockMvc.perform(post("/users")
                         .contentType("application/json")
                         .content(json))
@@ -44,6 +46,7 @@ public class UserControllerTest {
      */
     @Test
     public void testCreateUserWithInvalidEmailFormatShouldReturnError() throws Exception {
+        // CHECKSTYLE:OFF
         String json = """
             {
                 "email": "invalid-email.net",
@@ -51,6 +54,7 @@ public class UserControllerTest {
                 "birthday": "2000-01-01"
             }
         """;
+        // CHECKSTYLE:ON
         mockMvc.perform(post("/users")
                         .contentType("application/json")
                         .content(json))
@@ -63,6 +67,7 @@ public class UserControllerTest {
      */
     @Test
     public void testCreateUserWithLoginContainingSpaceShouldReturnError() throws Exception {
+        // CHECKSTYLE:OFF
         String json = """
             {
                 "email": "user@example.ru",
@@ -70,6 +75,7 @@ public class UserControllerTest {
                 "birthday": "2000-01-01"
             }
         """;
+        // CHECKSTYLE:ON
         mockMvc.perform(post("/users")
                         .contentType("application/json")
                         .content(json))
@@ -82,6 +88,7 @@ public class UserControllerTest {
      */
     @Test
     public void testCreateUserWithBirthdayInFutureShouldReturnError() throws Exception {
+        // CHECKSTYLE:OFF
         String json = """
             {
                 "email": "user@example.ru",
@@ -89,6 +96,7 @@ public class UserControllerTest {
                 "birthday": "3000-01-01"
             }
         """;
+        // CHECKSTYLE:ON
         mockMvc.perform(post("/users")
                         .contentType("application/json")
                         .content(json))
@@ -101,6 +109,7 @@ public class UserControllerTest {
      */
     @Test
     public void testCreateUserWithValidDataShouldReturnSuccess() throws Exception {
+        // CHECKSTYLE:OFF
         String json = """
             {
                 "email": "user@example.ru",
@@ -108,6 +117,7 @@ public class UserControllerTest {
                 "birthday": "2000-01-01"
             }
         """;
+        // CHECKSTYLE:ON
         mockMvc.perform(post("/users")
                         .contentType("application/json")
                         .content(json))
