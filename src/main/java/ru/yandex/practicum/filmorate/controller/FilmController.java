@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.Collection;
@@ -46,6 +47,30 @@ public class FilmController {
             throw e;
         }
     }
+
+    @PutMapping
+    public Film updateFilm(@Valid @RequestBody Film newFilm) {
+        log.info("PUT /films - попытка обновления фильма {}", newFilm.getName());
+        try {
+            Film existingFilm = films.get(newFilm.getId());
+            if (existingFilm == null) {
+                throw new NotFoundException("Фильм с ID " + newFilm.getId() + " не найден");
+            }
+            if (!newFilm.getName().equalsIgnoreCase(existingFilm.getName())
+            && films.values().stream().anyMatch(film -> film.getName().equalsIgnoreCase(newFilm.getName()))) {
+                throw new DuplicatedDataException("Этот фильм уже используется");
+            }
+            existingFilm.setName(newFilm.getName());
+            existingFilm.setDescription(newFilm.getDescription());
+            existingFilm.setReleaseDate(newFilm.getReleaseDate());
+            existingFilm.setDuration(newFilm.getDuration());
+            return existingFilm;
+        } catch (RuntimeException e) {
+            log.error("Ошибка при обновлении фильма {}", e.getMessage());
+            throw e;
+        }
+    }
+
 
     private long getNextId() {
         return idCounter.getAndIncrement();

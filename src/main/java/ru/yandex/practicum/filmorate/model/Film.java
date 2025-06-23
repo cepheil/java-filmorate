@@ -2,8 +2,8 @@ package ru.yandex.practicum.filmorate.model;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import ru.yandex.practicum.filmorate.annotation.MinReleaseDate;
 
-import java.time.Duration;
 import java.time.LocalDate;
 
 @Data
@@ -15,7 +15,8 @@ public class Film {
     private String description;
     @NotNull(message = "Дата релиза не может быть пустой")
     @PastOrPresent(message = "Дата релиза не может быть в будущем")
+    @MinReleaseDate
     private LocalDate releaseDate;
-    @Positive(message = "продолжительность фильма должна быть положительным числом")
-    private Duration duration;
+    @Positive(message = "продолжительность фильма должна быть положительным числом, в минутах")
+    private int duration;
 }
