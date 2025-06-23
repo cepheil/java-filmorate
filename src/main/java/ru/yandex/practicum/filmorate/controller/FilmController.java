@@ -61,11 +61,13 @@ public class FilmController {
         try {
             Film existingFilm = films.get(newFilm.getId());
             if (existingFilm == null) {
+                log.error("Отсутствует фильм с ID: {}", newFilm.getId());
                 throw new NotFoundException("Фильм с ID " + newFilm.getId() + " не найден");
             }
             if (!newFilm.getName().equalsIgnoreCase(existingFilm.getName())
             && films.values().stream().anyMatch(film -> film.getName().equalsIgnoreCase(newFilm.getName()))) {
-                throw new DuplicatedDataException("Этот фильм уже используется");
+                log.error("Такое название уже существует: {}", newFilm.getName());
+                throw new DuplicatedDataException("Фильм с таким названием уже существует");
             }
             existingFilm.setName(newFilm.getName());
             existingFilm.setDescription(newFilm.getDescription());
