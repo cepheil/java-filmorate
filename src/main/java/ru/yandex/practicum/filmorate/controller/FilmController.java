@@ -23,6 +23,7 @@ public class FilmController {
 
     private final Map<Long, Film> films = new HashMap<>();
     private final AtomicLong idCounter = new AtomicLong(1);
+    private static final LocalDate CINEMA_BIRTHDAY = LocalDate.of(1895, 12, 28);
 
     @GetMapping
     public Collection<Film> findAllFilms() {
@@ -37,7 +38,7 @@ public class FilmController {
     public Film createFilm(@Valid @RequestBody Film film) {
         log.info("POST /films - попытка добавления фильма: {}", film.getName());
         try {
-            if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
+            if (film.getReleaseDate().isBefore(CINEMA_BIRTHDAY)) {
                 log.error("Фильм создан раньше установленной даты: {}", film.getReleaseDate());
                 throw new ValidationException("Дата релиза не может быть раньше 28.12.1895");
             }

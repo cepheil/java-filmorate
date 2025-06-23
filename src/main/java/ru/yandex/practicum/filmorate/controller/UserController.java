@@ -63,6 +63,10 @@ public class UserController {
                 log.error("Логин содержит пробелы: {}", user.getLogin());
                 throw new ValidationException("Логин не может содержать пробелы");
             }
+            if (!user.getLogin().matches("[a-zA-Z0-9]+")) {
+                log.error("Логин не соответствует требованиям: {}", user.getLogin());
+                throw new ValidationException("Логин должен содержать только буквы и цифры");
+            }
             user.setId(getNextId());
             if (user.getName() == null || user.getName().isBlank()) {
                 user.setName(user.getLogin());
@@ -103,6 +107,10 @@ public class UserController {
             if (newUser.getLogin().contains(" ")) {
                 log.error("Логин содержит пробелы: {}", newUser.getLogin());
                 throw new ValidationException("Логин не может содержать пробелы");
+            }
+            if (!newUser.getLogin().matches("[a-zA-Z0-9]+")) {
+                log.error("Логин не соответствует требованиям: {}", newUser.getLogin());
+                throw new ValidationException("Логин должен содержать только буквы и цифры");
             }
             existingUser.setEmail(newUser.getEmail());
             existingUser.setLogin(newUser.getLogin());
