@@ -97,7 +97,12 @@ public class UserController {
             }
             if (!newUser.getEmail().equals(existingUser.getEmail())
                     && users.values().stream().anyMatch(user -> user.getEmail().equals(newUser.getEmail()))) {
+                log.error("Такой email уже существует: {}", newUser.getEmail());
                 throw new DuplicatedDataException("Email уже используется");
+            }
+            if (newUser.getLogin().contains(" ")) {
+                log.error("Логин содержит пробелы: {}", newUser.getLogin());
+                throw new ValidationException("Логин не может содержать пробелы");
             }
             existingUser.setEmail(newUser.getEmail());
             existingUser.setLogin(newUser.getLogin());
