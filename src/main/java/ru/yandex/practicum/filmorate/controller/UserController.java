@@ -51,7 +51,7 @@ public class UserController {
     public User createUser(@Valid @RequestBody User user) {
         log.info("POST /users - попытка создания пользователя: {}", user.getEmail());
         try {
-            if (users.values().stream().anyMatch(u -> u.getEmail().equals(user.getEmail()))) {
+            if (users.values().stream().anyMatch(u -> u.getEmail().equalsIgnoreCase(user.getEmail()))) {
                 throw new DuplicatedDataException("Email уже используется");
             }
             if (users.containsKey(user.getId())) {
@@ -88,11 +88,10 @@ public class UserController {
             if (existingUser == null) {
                 throw new NotFoundException("Пользователь с ID " + newUser.getId() + " не найден");
             }
-
             if (users.values()
                     .stream()
                     .anyMatch(user -> !user.getId().equals(newUser.getId())
-                    && user.getEmail().equals(newUser.getEmail()))) {
+                    && user.getEmail().equalsIgnoreCase(newUser.getEmail()))) {
                 throw new DuplicatedDataException("Этот имейл уже используется");
             }
             existingUser.setEmail(newUser.getEmail());
