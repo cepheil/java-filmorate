@@ -5,8 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -35,7 +37,12 @@ public class FilmController {
     public Film createFilm(@Valid @RequestBody Film film) {
         log.info("POST /films - попытка добавления фильма: {}", film.getName());
         try {
+            if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
+                log.error("Фильм создан раньше установленной даты: {}", film.getReleaseDate());
+                throw new ValidationException("Дата релиза не может быть раньше 28.12.1895");
+            }
             if (films.values().stream().anyMatch(f -> f.getName().equalsIgnoreCase(film.getName()))) {
+                log.error("Такое название уже существует: {}", film.getName());
                 throw new DuplicatedDataException("Фильм с таким названием уже существует");
             }
             film.setId(getNextId());
