@@ -55,10 +55,6 @@ public class UserController {
                 log.error("Такой email уже существует: {}", user.getEmail());
                 throw new DuplicatedDataException("Email уже используется");
             }
-            if (users.containsKey(user.getId())) {
-                log.error("Такой ID уже существует: {}", user.getId());
-                throw new DuplicatedDataException("Пользователь с таким ID уже существует");
-            }
             user.setId(getNextId());
             if (user.getName() == null || user.getName().isBlank()) {
                 user.setName(user.getLogin());
@@ -68,7 +64,7 @@ public class UserController {
             log.info("Пользователь создан: ID={}", user.getId());
             return user;
         } catch (RuntimeException e) {
-            log.trace("Ошибка при создании пользователя: {}", e.getMessage());
+            log.error("Ошибка при создании пользователя", e);
             throw e;
         }
     }
@@ -102,7 +98,7 @@ public class UserController {
             existingUser.setBirthday(newUser.getBirthday());
             return existingUser;
         } catch (RuntimeException e) {
-            log.trace("Ошибка при обновлении пользователя: {}", e.getMessage());
+            log.error("Ошибка при обновлении пользователя", e);
             throw e;
         }
     }

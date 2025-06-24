@@ -60,7 +60,7 @@ public class FilmController {
             log.info("Фильм создан: ID={}", film.getId());
             return film;
         } catch (RuntimeException e) {
-            log.trace("Ошибка при создании фильма: {}", e.getMessage());
+            log.error("Ошибка при создании фильма", e);
             throw e;
         }
     }
@@ -94,7 +94,7 @@ public class FilmController {
             existingFilm.setDuration(newFilm.getDuration());
             return existingFilm;
         } catch (RuntimeException e) {
-            log.trace("Ошибка при обновлении фильма {}", e.getMessage());
+            log.error("Ошибка при обновлении фильма", e);
             throw e;
         }
     }
