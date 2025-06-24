@@ -7,9 +7,7 @@ import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.validator.MinReleaseDateValidator;
 
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
