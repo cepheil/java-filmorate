@@ -59,14 +59,6 @@ public class UserController {
                 log.error("Такой ID уже существует: {}", user.getId());
                 throw new DuplicatedDataException("Пользователь с таким ID уже существует");
             }
-            if (user.getLogin().contains(" ")) {
-                log.error("Логин содержит пробелы: {}", user.getLogin());
-                throw new ValidationException("Логин не может содержать пробелы");
-            }
-            if (!user.getLogin().matches("[a-zA-Z0-9]+")) {
-                log.error("Логин не соответствует требованиям: {}", user.getLogin());
-                throw new ValidationException("Логин должен содержать только буквы и цифры");
-            }
             user.setId(getNextId());
             if (user.getName() == null || user.getName().isBlank()) {
                 user.setName(user.getLogin());
@@ -76,7 +68,7 @@ public class UserController {
             log.info("Пользователь создан: ID={}", user.getId());
             return user;
         } catch (RuntimeException e) {
-            log.error("Ошибка при создании пользователя: {}", e.getMessage());
+            log.trace("Ошибка при создании пользователя: {}", e.getMessage());
             throw e;
         }
     }
@@ -104,21 +96,13 @@ public class UserController {
                 log.error("Такой email уже существует: {}", newUser.getEmail());
                 throw new DuplicatedDataException("Email уже используется");
             }
-            if (newUser.getLogin().contains(" ")) {
-                log.error("Логин содержит пробелы: {}", newUser.getLogin());
-                throw new ValidationException("Логин не может содержать пробелы");
-            }
-            if (!newUser.getLogin().matches("[a-zA-Z0-9]+")) {
-                log.error("Логин не соответствует требованиям: {}", newUser.getLogin());
-                throw new ValidationException("Логин должен содержать только буквы и цифры");
-            }
             existingUser.setEmail(newUser.getEmail());
             existingUser.setLogin(newUser.getLogin());
             existingUser.setName(newUser.getName());
             existingUser.setBirthday(newUser.getBirthday());
             return existingUser;
         } catch (RuntimeException e) {
-            log.error("Ошибка при обновлении пользователя: {}", e.getMessage());
+            log.trace("Ошибка при обновлении пользователя: {}", e.getMessage());
             throw e;
         }
     }
