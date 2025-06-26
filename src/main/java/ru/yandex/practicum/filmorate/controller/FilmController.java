@@ -8,10 +8,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -89,9 +86,11 @@ public class FilmController {
                 throw new DuplicatedDataException("Фильм с таким названием уже существует");
             }
             existingFilm.setName(newFilm.getName());
-            existingFilm.setDescription(newFilm.getDescription());
-            existingFilm.setReleaseDate(newFilm.getReleaseDate());
-            existingFilm.setDuration(newFilm.getDuration());
+            Optional.ofNullable(newFilm.getDescription()).ifPresent(existingFilm::setDescription);
+            Optional.ofNullable(newFilm.getReleaseDate()).ifPresent(existingFilm::setReleaseDate);
+            if (existingFilm.getDuration() > 0) {
+                existingFilm.setDuration(newFilm.getDuration());
+            }
             return existingFilm;
         } catch (RuntimeException e) {
             log.error("Ошибка при обновлении фильма", e);

@@ -94,8 +94,12 @@ public class UserController {
             }
             existingUser.setEmail(newUser.getEmail());
             existingUser.setLogin(newUser.getLogin());
-            existingUser.setName(newUser.getName());
             existingUser.setBirthday(newUser.getBirthday());
+            if (newUser.getName() != null && !newUser.getName().isBlank()) {
+                existingUser.setName(newUser.getName());
+            } else {
+                existingUser.setName(newUser.getLogin());
+            }
             return existingUser;
         } catch (RuntimeException e) {
             log.error("Ошибка при обновлении пользователя", e);
