@@ -5,6 +5,7 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -23,6 +24,7 @@ public class UserValidationTest {
 
 
     @Test
+    @DisplayName("Пользователь: Пустой email → ошибка валидации")
     public void shouldFailIfEmailIsBlank() {
         User user = new User();
         user.setEmail(" ");
@@ -38,6 +40,7 @@ public class UserValidationTest {
 
 
     @Test
+    @DisplayName("Пользователь: email = null → ошибка валидации")
     public void shouldFailIfEmailIsNull() {
         User user = new User();
         user.setEmail(null);
@@ -53,6 +56,7 @@ public class UserValidationTest {
 
 
     @Test
+    @DisplayName("Пользователь: email не соответствует формату → ошибка валидации")
     public void shouldFailIfEmailIsNotValid() {
         User user = new User();
         user.setEmail("admin.com");
@@ -68,6 +72,7 @@ public class UserValidationTest {
 
 
     @Test
+    @DisplayName("Пользователь: login пустой → ошибка валидации")
     public void shouldFailIfLoginIsBlank() {
         User user = new User();
         user.setEmail("admin@mail.com");
@@ -83,6 +88,7 @@ public class UserValidationTest {
 
 
     @Test
+    @DisplayName("Пользователь: login содержит пробелы → ошибка валидации")
     public void shouldFailIfLoginNotValid() {
         User user = new User();
         user.setEmail("admin@mail.com");
@@ -98,6 +104,7 @@ public class UserValidationTest {
 
 
     @Test
+    @DisplayName("Пользователь: birthday = null → ошибка валидации")
     public void shouldFailIfBirthdayNull() {
         User user = new User();
         user.setEmail("admin@mail.com");
@@ -114,6 +121,7 @@ public class UserValidationTest {
 
 
     @Test
+    @DisplayName("Пользователь: birthday не может быть в будущем → ошибка валидации")
     public void testBirthdayCannotBeInFuture() {
         User user = new User();
         user.setEmail("admin@mail.com");

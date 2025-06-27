@@ -5,6 +5,7 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -24,6 +25,7 @@ public class FilmValidationTest {
     }
 
     @Test
+    @DisplayName("Фильм: Пустое имя → ошибка валидации")
     public void shouldFailIfNameIsBlank() {
         Film film = new Film();
         film.setName(" ");
@@ -38,6 +40,7 @@ public class FilmValidationTest {
 
 
     @Test
+    @DisplayName("Фильм:  Описание >200 символов → ошибка валидации")
     public void shouldFailIfDescriptionTooLong() {
         Film film = new Film();
         film.setName("Film");
@@ -52,6 +55,7 @@ public class FilmValidationTest {
 
 
     @Test
+    @DisplayName("Фильм:  Отрицательная продолжительность → ошибка валидации")
     public void shouldFailIfDurationIsNegative() {
         Film film = new Film();
         film.setName("Film");
@@ -66,6 +70,7 @@ public class FilmValidationTest {
 
 
     @Test
+    @DisplayName("Фильм: Продолжительность =0 → ошибка валидации")
     public void shouldFailIfDurationIsZero() {
         Film film = new Film();
         film.setName("Film");
@@ -80,6 +85,7 @@ public class FilmValidationTest {
 
 
     @Test
+    @DisplayName("Фильм: корректные данные → нет ошибок")
     public void shouldPassWithValidData() {
         Film film = new Film();
         film.setName("Film");
@@ -93,6 +99,7 @@ public class FilmValidationTest {
 
 
     @Test
+    @DisplayName("Фильм: Дата релиза = Null → ошибка валидации")
     public void shouldFailIfReleaseDateIsNull() {
         Film film = new Film();
         film.setName("Film");
@@ -107,6 +114,7 @@ public class FilmValidationTest {
 
 
     @Test
+    @DisplayName("Фильм: Дата релиза до 28.12.1895 → ошибка валидации")
     public void shouldThrowExceptionIfReleaseDateBefore1895() {
         Film film = new Film();
         film.setName("Film");
@@ -121,6 +129,5 @@ public class FilmValidationTest {
         //подтверждаем описание ошибки сравнения даты
         assertEquals("дата релиза — не раньше 28 декабря 1895 года", thrown.getMessage());
     }
-
 
 }

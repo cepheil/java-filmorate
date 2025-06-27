@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -17,6 +18,7 @@ public class UserControllerTest {
 
 
     @Test
+    @DisplayName("Пользователь: Пустой email → 400 Bad Request")
     public void shouldReturnErrorIfEmailIsBlank() throws Exception {
         // CHECKSTYLE:OFF
         String json = """
@@ -35,6 +37,7 @@ public class UserControllerTest {
 
 
     @Test
+    @DisplayName("Пользователь: email = null  → 400 Bad Request")
     public void shouldReturnErrorIfEmailIsNull() throws Exception {
         // CHECKSTYLE:OFF
         String json = """
@@ -53,6 +56,7 @@ public class UserControllerTest {
 
 
     @Test
+    @DisplayName("Пользователь: email не соответствует формату  → 400 Bad Request")
     public void shouldReturnErrorIfEmailIsNotValid() throws Exception {
         // CHECKSTYLE:OFF
         String json = """
@@ -71,6 +75,7 @@ public class UserControllerTest {
 
 
     @Test
+    @DisplayName("Пользователь: login пустой  → 400 Bad Request")
     public void shouldReturnErrorIfLoginIsBlank() throws Exception {
         // CHECKSTYLE:OFF
         String json = """
@@ -89,6 +94,7 @@ public class UserControllerTest {
 
 
     @Test
+    @DisplayName("Пользователь: login содержит пробелы  → 400 Bad Request")
     public void shouldReturnErrorIfLoginNotValid() throws Exception {
         // CHECKSTYLE:OFF
         String json = """
@@ -106,6 +112,7 @@ public class UserControllerTest {
 
 
     @Test
+    @DisplayName("Пользователь: birthday = null  → 400 Bad Request")
     public void shouldReturnErrorIfBirthdayNull() throws Exception {
         // CHECKSTYLE:OFF
         String json = """
@@ -124,6 +131,7 @@ public class UserControllerTest {
 
 
     @Test
+    @DisplayName("Пользователь: birthday не может быть в будущем  → 400 Bad Request")
     public void shouldReturnErrorIfBirthdayInFuture() throws Exception {
         // CHECKSTYLE:OFF
         String json = """
@@ -141,6 +149,7 @@ public class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Пользователь: Валидные данные → 200 OK")
     public void shouldCreateUserWithValidData() throws Exception {
         // CHECKSTYLE:OFF
         String json = """

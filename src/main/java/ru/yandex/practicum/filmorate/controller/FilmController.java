@@ -22,7 +22,7 @@ import java.util.Map;
 public class FilmController {
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
     private final Map<Long, Film> films = new HashMap<>();
-    LocalDate movieBirthDate = LocalDate.of(1895, 12, 28);
+    private final LocalDate movieBirthDate = LocalDate.of(1895, 12, 28);
 
     @GetMapping
     public Collection<Film> getAllFilms() {
@@ -34,8 +34,8 @@ public class FilmController {
     public Film createFilm(@Valid @RequestBody Film film) {
         log.info("POST /films добавление фильма: {}", film.getName());
         for (Film f : films.values()) {
-            if (f.getName().equals(film.getName())) {
-                log.error("Ошибка: Такое название уже существует {}", film.getName());
+            if (f.getName().equals(film.getName()) && f.getReleaseDate().equals(film.getReleaseDate())) {
+                log.error("Ошибка: Такой фильм уже существует {}, релиз: {}", film.getName(), film.getReleaseDate());
                 throw new DuplicatedDataException("Такое название уже существует");
             }
         }
@@ -73,9 +73,11 @@ public class FilmController {
 
         if (newFilm.getName() != null && !newFilm.getName().equals(existingFilm.getName())) {
             for (Film f : films.values()) {
-                if (!f.getId().equals(existingFilm.getId()) && f.getName().equals(newFilm.getName())) {
-                    log.error("Ошибка: Такое название уже существует: {}", newFilm.getName());
-                    throw new DuplicatedDataException("Такое название уже существует");
+                if (!f.getId().equals(existingFilm.getId()) && f.getName().equals(newFilm.getName()) &&
+                        f.getReleaseDate().equals(newFilm.getReleaseDate())) {
+                    log.error("Ошибка: Такой фильм уже существует: {}, релиз: {}",
+                            newFilm.getName(), newFilm.getReleaseDate());
+                    throw new DuplicatedDataException("Такой фильм уже существует");
                 }
             }
             existingFilm.setName(newFilm.getName());
@@ -109,6 +111,5 @@ public class FilmController {
                 .orElse(0);
         return ++currentMaxId;
     }
-
 
 }
