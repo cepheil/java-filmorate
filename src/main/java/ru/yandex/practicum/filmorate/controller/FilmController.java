@@ -88,9 +88,7 @@ public class FilmController {
             existingFilm.setName(newFilm.getName());
             Optional.ofNullable(newFilm.getDescription()).ifPresent(existingFilm::setDescription);
             Optional.ofNullable(newFilm.getReleaseDate()).ifPresent(existingFilm::setReleaseDate);
-            if (existingFilm.getDuration() > 0) {
-                existingFilm.setDuration(newFilm.getDuration());
-            }
+            Optional.ofNullable(newFilm.getDuration()).ifPresent(existingFilm::setDuration);
             return existingFilm;
         } catch (RuntimeException e) {
             log.error("Ошибка при обновлении фильма", e);

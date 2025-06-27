@@ -22,5 +22,5 @@ public class Film {
     @MinReleaseDate
     private LocalDate releaseDate;
     @Positive(message = "продолжительность фильма должна быть положительным числом, в минутах")
-    private int duration;
+    private Integer duration;
 }
