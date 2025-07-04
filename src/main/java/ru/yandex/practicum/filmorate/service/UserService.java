@@ -1,82 +1,43 @@
 package ru.yandex.practicum.filmorate.service;
 
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dal.UserRepository;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-
-import java.util.*;
-import java.util.stream.Collectors;
-
+import java.util.Collection;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final UserRepository jdbcUserRepository;
-    private final EntityValidator entityValidator;
+    private final UserStorage userStorage;
 
-
-    public User createUser(User user) {
-        log.info("POST /users добавление пользователя: {}", user.getName());
-        entityValidator.validateUser(user);
-        entityValidator.validateUserEmailUniqueness(user);
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
+    public void addFriend(Long userId, Long friendId) {
+        if (userId.equals(friendId)) {
+            log.warn("Попытка пользователя ID={} добавить себя в друзья", userId);
+            throw new ValidationException("Нельзя добавить себя в друзья");
         }
-        User createdUser = jdbcUserRepository.create(user);
-        log.info("Пользователь: {} , ID: {} , добавлен!", user.getName(), user.getId());
-        return createdUser;
+        userStorage.addFriend(userId, friendId);
+        log.info("Пользователь ID={} и пользователь ID={} теперь друзья", userId, friendId);
     }
 
-
-    public User updateUser(User newUser) {
-        log.info("PUT /users - обновление пользователя: {}", newUser.getName());
-        entityValidator.validateUserForUpdate(newUser);
-        User updatedUser = jdbcUserRepository.update(newUser);
-        log.info("Пользователь с ID {} успешно обновлён", newUser.getId());
-        return updatedUser;
+    public void removeFriend(Long userId, Long friendId) {
+        userStorage.removeFriend(userId, friendId);
+        log.info("Пользователь ID={} и пользователь ID={} больше не друзья", userId, friendId);
     }
 
-
-    public Collection<User> getAllUsers() {
-        log.info("GET /users - получение списка всех пользователей");
-        return jdbcUserRepository.findAll()
-                .stream()
-                .sorted(Comparator.comparing(User::getId))
-                .collect(Collectors.toList());
+    public Collection<User> getFriends(Long userId) {
+        Collection<User> friends = userStorage.getFriends(userId);
+        log.debug("Запрошен список друзей пользователя ID={} (всего: {})", userId, friends.size());
+        return friends;
     }
 
-
-    public User getUserById(Long id) {
-        log.info("GET /users/{userId} - получение пользователя по Id");
-        if (id == null) {
-            log.error("Запрос пользователя с null-ID отклонён");
-            throw new ValidationException("ID пользователя не может быть null");
-        }
-        return jdbcUserRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Пользователя с ID=" + id + " не найден"));
+    public Collection<User> getCommonFriends(Long userId1, Long userId2) {
+        Collection<User> commonFriends = userStorage.getCommonFriends(userId1, userId2);
+        log.debug("Найдено {} общих друзей между ID={} и ID={}", commonFriends.size(), userId1, userId2);
+        return commonFriends;
     }
-
-
-    public void deleteUser(Long id) {
-        log.info("DELETE /users/{userId} - удаление пользователя по его ID");
-        if (id == null) {
-            log.error("Удаление пользователя с null-ID отклонён");
-            throw new ValidationException("ID пользователя не может быть null");
-        }
-
-        if (!jdbcUserRepository.delete(id)) {
-            log.warn("Пользователь с ID={} не найден при попытке удаления", id);
-            throw new NotFoundException("Пользователь с ID=" + id + " не найден");
-        }
-        log.info("Пользователь с ID {} успешно удалён", id);
-    }
-
 }
-
