@@ -10,26 +10,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Аннотация {@code MinReleaseDate} используется для валидации даты релиза фильма.
- * Она гарантирует, что дата не может быть раньше установленной минимальной даты (28 декабря 1895 года).
+ * Аннотация {@code MinReleaseDate} применяется к полю, представляющему дату релиза фильма.
+ * Используется для проверки того, что указанная дата не раньше минимально допустимой — 28 декабря 1895 года.
+ * Аннотация поддерживает интеграцию с Jakarta Bean Validation и работает через связанный валидатор
+ * {@link ru.yandex.practicum.filmorate.validator.MinReleaseDateValidator}.
  */
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = MinReleaseDateValidator.class)
 public @interface MinReleaseDate {
-    /**
-     * Возврат сообщения об ошибке, если дата релиза меньше допустимой.
-     * @return сообщение об ошибке
-     */
     String message() default "Дата релиза не может быть раньше 28 декабря 1895 года";
-    /**
-     * Группы валидации, к которым относится эта аннотация.
-     * @return массив групп валидации
-     */
     Class<?>[] groups() default {};
-    /**
-     * Дополнительные данные (payload), связанные с ограничением.
-     * @return массив объектов Payload
-     */
     Class<? extends Payload>[] payload() default {};
 }

@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -16,7 +15,6 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class InMemoryFilmStorage implements FilmStorage {
-    private final UserStorage userStorage;
 
     private final Map<Long, Film> films = new HashMap<>();
     private final AtomicLong idCounter = new AtomicLong(1);
@@ -70,32 +68,6 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film getFilmById(Long id) {
         return films.get(id);
-    }
-
-    @Override
-    public void addLike(Long filmId, Long userId) {
-        Film film = films.get(filmId);
-        User user = userStorage.getUserById(userId);
-        if (film == null) {
-            throw new NotFoundException("Фильм не найден.");
-        }
-        if (user == null) {
-            throw new NotFoundException("Пользователь не найден.");
-        }
-        film.getLikes().add(userId);
-    }
-
-    @Override
-    public void removeLike(Long filmId, Long userId) {
-        Film film = films.get(filmId);
-        User user = userStorage.getUserById(userId);
-        if (film == null) {
-            throw new NotFoundException("Фильм не найден.");
-        }
-        if (user == null) {
-            throw new NotFoundException("Пользователь не найден.");
-        }
-        film.getLikes().remove(userId);
     }
 
     @Override

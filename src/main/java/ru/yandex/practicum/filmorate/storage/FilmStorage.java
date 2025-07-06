@@ -6,10 +6,8 @@ import java.util.Collection;
 
 public interface FilmStorage {
     Collection<Film> findAllFilms();
+    Collection<Film> getPopularFilms(int count);
     Film createFilm(Film film);
     Film updateFilm(Film newFilm);
     Film getFilmById(Long id);
-    void addLike(Long filmId, Long userId);
-    void removeLike(Long filmId, Long userId);
-    Collection<Film> getPopularFilms(int count);
 }

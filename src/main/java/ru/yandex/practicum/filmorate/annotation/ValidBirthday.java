@@ -9,6 +9,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Аннотация {@code ValidBirthday} применяется к полю, представляющему дату рождения пользователя.
+ * Используется для проверки того, что указанная дата должна быть меньше или равна текущей дате.
+ * Аннотация поддерживает интеграцию с Jakarta Bean Validation и работает через связанный валидатор
+ * {@link ru.yandex.practicum.filmorate.validator.UserBirthdayValidator}.
+ */
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = UserBirthdayValidator.class)
