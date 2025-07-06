@@ -72,7 +72,7 @@ public class FilmValidationTest {
     @Test
     public void testDurationMustBePositive() {
         Film film = new Film();
-        film.setDuration(0);
+        film.setDuration(Integer.valueOf(0));
         var violations = validator.validate(film);
         assertFalse(violations.isEmpty());
     }
