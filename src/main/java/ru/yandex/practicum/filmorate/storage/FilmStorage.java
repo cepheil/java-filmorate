@@ -24,8 +24,12 @@ import java.util.Collection;
  */
 public interface FilmStorage {
     Collection<Film> findAllFilms();
+
     Collection<Film> getPopularFilms(int count);
+
     Film createFilm(Film film);
+
     Film updateFilm(Film newFilm);
+
     Film getFilmById(Long id);
 }

@@ -29,7 +29,7 @@ public class LoginValidator implements ConstraintValidator<ValidLogin, String> {
     /**
      * Проверяет, соответствует ли значение заданному формату логина.
      *
-     * @param value значение поля, которое необходимо проверить
+     * @param value   значение поля, которое необходимо проверить
      * @param context контекст валидации
      * @return {@code true}, если значение не равно {@code null} и соответствует формату, иначе {@code false}
      */

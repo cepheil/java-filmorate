@@ -20,6 +20,8 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = UserBirthdayValidator.class)
 public @interface ValidBirthday {
     String message() default "Дата рождения должна быть в прошлом.";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

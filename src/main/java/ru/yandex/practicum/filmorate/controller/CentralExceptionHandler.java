@@ -80,7 +80,7 @@ public class CentralExceptionHandler {
      */
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-        public ErrorResponse handleNotFoundException(final NotFoundException e) {
+    public ErrorResponse handleNotFoundException(final NotFoundException e) {
         log.warn("Объект не найден: {}", e.getMessage(), e);
         return new ErrorResponse(e.getMessage());
     }

@@ -28,7 +28,7 @@ public class MinReleaseDateValidator implements ConstraintValidator<MinReleaseDa
     /**
      * Проверяет, является ли указанная дата релиза допустимой.
      *
-     * @param date дата релиза фильма ({@link LocalDate}), может быть {@code null}
+     * @param date    дата релиза фильма ({@link LocalDate}), может быть {@code null}
      * @param context контекст валидации
      * @return {@code true}, если дата равна {@code null} или не ранее 28.12.1895, иначе {@code false}
      */

@@ -70,8 +70,8 @@ public class InMemoryUserStorage implements UserStorage {
                 .stream()
                 .anyMatch(u -> u.getEmail().equalsIgnoreCase(user.getEmail()))) {
             log.error("Такой email уже существует: {}", user.getEmail());
-        throw new DuplicatedDataException("Email уже используется.");
-    }
+            throw new DuplicatedDataException("Email уже используется.");
+        }
         user.setId(Long.valueOf(idCounter.getAndIncrement()));
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
@@ -89,7 +89,7 @@ public class InMemoryUserStorage implements UserStorage {
      *
      * @param newUser объект пользователя с обновлёнными данными
      * @return обновлённый объект {@link User}
-     * @throws NotFoundException если пользователь с указанным ID не найден
+     * @throws NotFoundException       если пользователь с указанным ID не найден
      * @throws DuplicatedDataException если новый email уже занят
      */
     @Override
@@ -101,9 +101,9 @@ public class InMemoryUserStorage implements UserStorage {
             throw new NotFoundException("Пользователь с ID " + newUser.getId() + " не найден.");
         }
         if (!newUser.getEmail().equalsIgnoreCase(existingUser.getEmail()) &&
-        users.values()
-                .stream()
-                .anyMatch(user -> user.getEmail().equalsIgnoreCase(newUser.getEmail()))) {
+                users.values()
+                        .stream()
+                        .anyMatch(user -> user.getEmail().equalsIgnoreCase(newUser.getEmail()))) {
             log.error("Такой email уже существует: {}", newUser.getEmail());
             throw new DuplicatedDataException("Email уже используется.");
         }

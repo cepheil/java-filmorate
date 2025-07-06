@@ -20,6 +20,8 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = LoginValidator.class)
 public @interface ValidLogin {
     String message() default "Логин должен содержать только буквы и цифры и не может содержать пробелов.";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

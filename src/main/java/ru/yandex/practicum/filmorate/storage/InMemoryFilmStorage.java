@@ -76,10 +76,10 @@ public class InMemoryFilmStorage implements FilmStorage {
             log.error("Такое название уже существует: {}", film.getName());
             throw new DuplicatedDataException("Фильм с таким названием уже существует.");
         }
-            film.setId(Long.valueOf(idCounter.getAndIncrement()));
-            films.put(film.getId(), film);
-            log.info("Фильм создан: ID={}", film.getId());
-            return film;
+        film.setId(Long.valueOf(idCounter.getAndIncrement()));
+        films.put(film.getId(), film);
+        log.info("Фильм создан: ID={}", film.getId());
+        return film;
     }
 
     /**
@@ -89,7 +89,7 @@ public class InMemoryFilmStorage implements FilmStorage {
      *
      * @param newFilm объект фильма с обновлёнными данными
      * @return обновлённый объект {@link Film}
-     * @throws NotFoundException если фильм с указанным ID не найден
+     * @throws NotFoundException       если фильм с указанным ID не найден
      * @throws DuplicatedDataException если новое название уже занято
      */
     @Override
@@ -101,9 +101,9 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new NotFoundException("Фильм с ID " + newFilm.getId() + " не найден.");
         }
         if (!newFilm.getName().equalsIgnoreCase(existingFilm.getName()) &&
-        films.values()
-                .stream()
-                .anyMatch(film -> film.getName().equalsIgnoreCase(newFilm.getName()))) {
+                films.values()
+                        .stream()
+                        .anyMatch(film -> film.getName().equalsIgnoreCase(newFilm.getName()))) {
             log.error("Такое название уже существует: {}", newFilm.getName());
             throw new DuplicatedDataException("Фильм с таким названием уже существует.");
         }

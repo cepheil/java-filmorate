@@ -22,7 +22,7 @@ public class UserBirthdayValidator implements ConstraintValidator<ValidBirthday,
     /**
      * Проверяет, является ли указанная дата рождения допустимой.
      *
-     * @param value дата рождения пользователя ({@link LocalDate}), может быть {@code null}
+     * @param value   дата рождения пользователя ({@link LocalDate}), может быть {@code null}
      * @param context контекст валидации
      * @return {@code true}, если дата равна {@code null} или не позже текущей даты, иначе {@code false}
      */
