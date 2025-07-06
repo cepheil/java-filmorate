@@ -1,10 +1,12 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -12,7 +14,10 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class InMemoryFilmStorage implements FilmStorage {
+    private final UserStorage userStorage;
+
     private final Map<Long, Film> films = new HashMap<>();
     private final AtomicLong idCounter = new AtomicLong(1);
 
@@ -56,7 +61,7 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new DuplicatedDataException("Фильм с таким названием уже существует.");
         }
         existingFilm.setName(newFilm.getName());
-        Optional.ofNullable(newFilm.getDuration()).ifPresent(existingFilm::setDuration);
+        Optional.ofNullable(newFilm.getDescription()).ifPresent(existingFilm::setDescription);
         Optional.ofNullable(newFilm.getReleaseDate()).ifPresent(existingFilm::setReleaseDate);
         Optional.ofNullable(newFilm.getDuration()).ifPresent(existingFilm::setDuration);
         return existingFilm;
@@ -70,8 +75,12 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public void addLike(Long filmId, Long userId) {
         Film film = films.get(filmId);
+        User user = userStorage.getUserById(userId);
         if (film == null) {
             throw new NotFoundException("Фильм не найден.");
+        }
+        if (user == null) {
+            throw new NotFoundException("Пользователь не найден.");
         }
         film.getLikes().add(userId);
     }
@@ -79,8 +88,12 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public void removeLike(Long filmId, Long userId) {
         Film film = films.get(filmId);
+        User user = userStorage.getUserById(userId);
         if (film == null) {
             throw new NotFoundException("Фильм не найден.");
+        }
+        if (user == null) {
+            throw new NotFoundException("Пользователь не найден.");
         }
         film.getLikes().remove(userId);
     }
