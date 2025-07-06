@@ -23,7 +23,7 @@ public class FilmController {
         return filmStorage.findAllFilms();
     }
 
-    @GetMapping
+    @GetMapping("/popular")
     public Collection<Film> getPopulateFilms(@RequestParam(defaultValue = "10") int count) {
         return filmService.getPopularFilms(count);
     }
