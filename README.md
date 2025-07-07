@@ -192,6 +192,7 @@ sequenceDiagram
     UserController-->>Frontend: 200 OK
 ```
 
+---
 
 ## ❤️ Добавление лайка
 ```java
