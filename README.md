@@ -71,6 +71,33 @@ java -jar target/filmorate-0.0.1-SNAPSHOT.jar
 ---
 
 
+## 🏛️ Архитектура
+```mermaid
+classDiagram
+    direction BT
+    
+    class FilmController {
+        +addLike(id, userId) void
+    }
+    
+    class FilmService {
+        -filmStorage: FilmStorage
+        +addLike(id, userId) void
+    }
+    
+    class InMemoryFilmStorage {
+        -films: Map~Long, Film~
+        +save(Film) Film
+    }
+    
+    FilmController --> FilmService
+    FilmService --> InMemoryFilmStorage
+```
+
+
+---
+
+
 # 🔑 Ключевые компоненты
 ## Слои:
 
@@ -128,8 +155,8 @@ java -jar target/filmorate-0.0.1-SNAPSHOT.jar
 ---
 
 
-# 💡 Примеры кода
-## 🧑‍🤝‍🧑 Добавление друга (UserService)
+# 💡 Примеры
+## 🧍 Добавление друга (UserService)
 
 ```java
 public void addFriend(Long userId, Long friendId) {
@@ -145,13 +172,56 @@ public void addFriend(Long userId, Long friendId) {
 }
 ```
 
-## ✔️ Валидация фильма (Film)
+## Последовательность действий
+```mermaid
+sequenceDiagram
+    participant Frontend
+    participant UserController
+    participant UserService
+    participant Storage
+    
+    Frontend->>UserController: PUT /users/1/friends/2
+    UserController->>UserService: addFriend(1, 2)
+    UserService->>Storage: getById(1)
+    Storage-->>UserService: User
+    UserService->>Storage: getById(2)
+    Storage-->>UserService: User
+    UserService->>Storage: save(User)
+    UserService->>Storage: save(Friend)
+    UserService-->>UserController: OK
+    UserController-->>Frontend: 200 OK
+```
+
+
+## ❤️ Добавление лайка
 ```java
-@Data
-public class Film {
-    @NotBlank private String name;
-    @Size(max = 200) private String description;
-    @MinReleaseDate private LocalDate releaseDate;
-    @Positive private int duration;
-}
+public void addLike(Long filmId, Long userId) {
+        Film film = filmStorage.getFilmById(filmId);
+        if (filmStorage.getFilmById(filmId) == null) {
+            throw new NotFoundException("Фильм не найден.");
+        }
+        User user = userStorage.getUserById(userId);
+        if (user == null) {
+            throw new NotFoundException("Пользователь не найден.");
+        }
+        film.getLikes().add(userId);
+    }
+```
+
+## Последовательность действий
+```mermaid
+sequenceDiagram
+    participant User
+    participant Controller
+    participant Service
+    participant Storage
+    
+    User->>Controller: PUT /films/1/like/101
+    Controller->>Service: addLike(1, 101)
+    Service->>Storage: getById(1)
+    Storage-->>Service: Film
+    Service->>Storage: save(Film)
+    Storage-->>Service: Film
+    Service-->>Controller: OK
+    Controller-->>User: 200 OK
 ```
