@@ -41,8 +41,11 @@ public class UserService {
      */
     public void addFriend(Long userId, Long friendId) {
         User user = userStorage.getUserById(userId);
+        if (user == null) {
+            throw new NotFoundException("Пользователь не найден.");
+        }
         User friend = userStorage.getUserById(friendId);
-        if (user == null || friend == null) {
+        if (friend == null) {
             throw new NotFoundException("Пользователь не найден.");
         }
         user.getFriends().add(friendId);
@@ -58,8 +61,11 @@ public class UserService {
      */
     public void removeFriend(Long userId, Long friendId) {
         User user = userStorage.getUserById(userId);
+        if (user == null) {
+            throw new NotFoundException("Пользователь не найден.");
+        }
         User friend = userStorage.getUserById(friendId);
-        if (user == null || friend == null) {
+        if (friend == null) {
             throw new NotFoundException("Пользователь не найден.");
         }
         user.getFriends().remove(friendId);
@@ -106,14 +112,23 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Возвращает список всех пользователей.
+     */
     public Collection<User> findAllUsers() {
         return userStorage.findAllUsers();
     }
 
+    /**
+     * Создаёт нового пользователя.
+     */
     public User createUser(User user) {
         return userStorage.createUser(user);
     }
 
+    /**
+     * Обновляет данные существующего пользователя.
+     */
     public User updateUser(User newUser) {
         return userStorage.updateUser(newUser);
     }

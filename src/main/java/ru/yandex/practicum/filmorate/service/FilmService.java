@@ -42,10 +42,10 @@ public class FilmService {
      */
     public void addLike(Long filmId, Long userId) {
         Film film = filmStorage.getFilmById(filmId);
-        User user = userStorage.getUserById(userId);
-        if (film == null) {
+        if (filmStorage.getFilmById(filmId) == null) {
             throw new NotFoundException("Фильм не найден.");
         }
+        User user = userStorage.getUserById(userId);
         if (user == null) {
             throw new NotFoundException("Пользователь не найден.");
         }
@@ -61,28 +61,40 @@ public class FilmService {
      */
     public void removeLike(Long filmId, Long userId) {
         Film film = filmStorage.getFilmById(filmId);
-        User user = userStorage.getUserById(userId);
         if (film == null) {
             throw new NotFoundException("Фильм не найден.");
         }
+        User user = userStorage.getUserById(userId);
         if (user == null) {
             throw new NotFoundException("Пользователь не найден.");
         }
         film.getLikes().remove(userId);
     }
 
+    /**
+     * Возвращает список всех фильмов.
+     */
     public Collection<Film> findAllFilms() {
         return filmStorage.findAllFilms();
     }
 
+    /**
+     * Возвращает самые популярные фильмы (по количеству лайков).
+     */
     public Collection<Film> getPopularFilms(int count) {
         return filmStorage.getPopularFilms(count);
     }
 
+    /**
+     * Создаёт новый фильм.
+     */
     public Film createFilm(Film film) {
         return filmStorage.createFilm(film);
     }
 
+    /**
+     * Обновляет данные фильма.
+     */
     public Film updateFilm(Film newFilm) {
         return filmStorage.updateFilm(newFilm);
     }
