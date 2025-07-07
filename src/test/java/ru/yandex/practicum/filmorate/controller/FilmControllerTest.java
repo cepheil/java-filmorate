@@ -7,7 +7,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,13 +26,10 @@ import static org.mockito.Mockito.*;
  *     <li>Добавление и удаление лайков</li>
  * </ul>
  *
- * <p>Для тестирования используются моки ({@link Mock}) объектов {@link FilmStorage} и {@link FilmService},
+ * <p>Для тестирования используется мок ({@link Mock}) объекта {@link FilmService},
  * а тестируемый класс ({@link FilmController}) внедряется через {@link InjectMocks}.</p>
  */
 public class FilmControllerTest {
-
-    @Mock
-    private FilmStorage filmStorage;
 
     @Mock
     private FilmService filmService;
@@ -49,7 +45,7 @@ public class FilmControllerTest {
     /**
      * Проверяет, что метод {@link FilmController#findAllFilms()} возвращает список всех фильмов.
      *
-     * <p>Ожидается, что вызов делегируется в {@link FilmStorage#findAllFilms()}</p>
+     * <p>Ожидается, что вызов делегируется в {@link FilmService#findAllFilms()}</p>
      */
     @Test
     public void testFindAllFilms() {
@@ -57,18 +53,18 @@ public class FilmControllerTest {
         Film film2 = new Film();
         Collection<Film> films = Arrays.asList(film1, film2);
 
-        when(filmStorage.findAllFilms()).thenReturn(films);
+        when(filmService.findAllFilms()).thenReturn(films);
 
         Collection<Film> result = filmController.findAllFilms();
 
         assertEquals(2, result.size());
-        verify(filmStorage, times(1)).findAllFilms();
+        verify(filmService, times(1)).findAllFilms();
     }
 
     /**
      * Проверяет, что метод {@link FilmController#getPopulateFilms(int)} возвращает указанное количество фильмов.
      *
-     * <p>Ожидается, что вызов делегируется в {@link FilmStorage#getPopularFilms(int)}</p>
+     * <p>Ожидается, что вызов делегируется в {@link FilmService#getPopularFilms(int)}</p>
      */
     @Test
     public void testGetPopulateFilms() {
@@ -77,46 +73,46 @@ public class FilmControllerTest {
         Film film2 = new Film();
         Collection<Film> popularFilms = Arrays.asList(film1, film2);
 
-        when(filmStorage.getPopularFilms(count)).thenReturn(popularFilms);
+        when(filmService.getPopularFilms(count)).thenReturn(popularFilms);
 
         Collection<Film> result = filmController.getPopulateFilms(count);
 
         assertEquals(2, result.size());
-        verify(filmStorage, times(1)).getPopularFilms(count);
+        verify(filmService, times(1)).getPopularFilms(count);
     }
 
     /**
      * Проверяет, что метод {@link FilmController#createFilm(Film)} корректно создаёт новый фильм.
      *
-     * <p>Ожидается, что вызов делегируется в {@link FilmStorage#createFilm(Film)}</p>
+     * <p>Ожидается, что вызов делегируется в {@link FilmService#createFilm(Film)}</p>
      */
     @Test
     public void testCreateFilm() {
         Film film = new Film();
 
-        when(filmStorage.createFilm(film)).thenReturn(film);
+        when(filmService.createFilm(film)).thenReturn(film);
 
         Film result = filmController.createFilm(film);
 
         assertEquals(film, result);
-        verify(filmStorage, times(1)).createFilm(film);
+        verify(filmService, times(1)).createFilm(film);
     }
 
     /**
      * Проверяет, что метод {@link FilmController#updateFilm(Film)} корректно обновляет данные фильма.
      *
-     * <p>Ожидается, что вызов делегируется в {@link FilmStorage#updateFilm(Film)}</p>
+     * <p>Ожидается, что вызов делегируется в {@link FilmService#updateFilm(Film)}</p>
      */
     @Test
     public void testUpdateFilm() {
         Film newFilm = new Film();
 
-        when(filmStorage.updateFilm(newFilm)).thenReturn(newFilm);
+        when(filmService.updateFilm(newFilm)).thenReturn(newFilm);
 
         Film result = filmController.updateFilm(newFilm);
 
         assertEquals(newFilm, result);
-        verify(filmStorage, times(1)).updateFilm(newFilm);
+        verify(filmService, times(1)).updateFilm(newFilm);
     }
 
     /**

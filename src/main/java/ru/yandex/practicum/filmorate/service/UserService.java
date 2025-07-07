@@ -105,4 +105,16 @@ public class UserService {
                 .map(userStorage::getUserById)
                 .collect(Collectors.toList());
     }
+
+    public Collection<User> findAllUsers() {
+        return userStorage.findAllUsers();
+    }
+
+    public User createUser(User user) {
+        return userStorage.createUser(user);
+    }
+
+    public User updateUser(User newUser) {
+        return userStorage.updateUser(newUser);
+    }
 }

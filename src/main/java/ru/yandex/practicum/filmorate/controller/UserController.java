@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Collection;
 
@@ -23,14 +22,13 @@ import java.util.Collection;
  *     <li>Поиск общих друзей между двумя пользователями</li>
  * </ul>
  *
- * <p>Все операции выполняются через соответствующие слои: хранение данных ({@link UserStorage}) и бизнес-логику ({@link UserService}).</p>
+ * <p>Все операции выполняются через слой: бизнес-логику ({@link UserService}).</p>
  */
 @Slf4j
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
-    private final UserStorage userStorage;
     private final UserService userService;
 
     /**
@@ -40,7 +38,7 @@ public class UserController {
      */
     @GetMapping
     public Collection<User> findAllUsers() {
-        return userStorage.findAllUsers();
+        return userService.findAllUsers();
     }
 
     /**
@@ -75,7 +73,7 @@ public class UserController {
      */
     @PostMapping
     public User createUser(@Valid @RequestBody User user) {
-        return userStorage.createUser(user);
+        return userService.createUser(user);
     }
 
     /**
@@ -86,7 +84,7 @@ public class UserController {
      */
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
-        return userStorage.updateUser(user);
+        return userService.updateUser(user);
     }
 
     /**

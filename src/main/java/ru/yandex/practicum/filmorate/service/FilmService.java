@@ -9,6 +9,8 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.util.Collection;
+
 /**
  * Класс {@code FilmService} содержит бизнес-логику, связанную с фильмами.
  *
@@ -67,5 +69,21 @@ public class FilmService {
             throw new NotFoundException("Пользователь не найден.");
         }
         film.getLikes().remove(userId);
+    }
+
+    public Collection<Film> findAllFilms() {
+        return filmStorage.findAllFilms();
+    }
+
+    public Collection<Film> getPopularFilms(int count) {
+        return filmStorage.getPopularFilms(count);
+    }
+
+    public Film createFilm(Film film) {
+        return filmStorage.createFilm(film);
+    }
+
+    public Film updateFilm(Film newFilm) {
+        return filmStorage.updateFilm(newFilm);
     }
 }

@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.util.Collection;
 
@@ -22,14 +21,13 @@ import java.util.Collection;
  *     <li>Добавление и удаление лайков у фильма</li>
  * </ul>
  *
- * <p>Все операции выполняются через соответствующие слои: хранение данных ({@link FilmStorage}) и бизнес-логику ({@link FilmService}).</p>
+ * <p>Все операции выполняются через соответствующий слой: бизнес-логику ({@link FilmService}).</p>
  */
 @Slf4j
 @RestController
 @RequestMapping("/films")
 @RequiredArgsConstructor
 public class FilmController {
-    private final FilmStorage filmStorage;
     private final FilmService filmService;
 
     /**
@@ -39,7 +37,7 @@ public class FilmController {
      */
     @GetMapping
     public Collection<Film> findAllFilms() {
-        return filmStorage.findAllFilms();
+        return filmService.findAllFilms();
     }
 
     /**
@@ -51,7 +49,7 @@ public class FilmController {
      */
     @GetMapping("/popular")
     public Collection<Film> getPopulateFilms(@RequestParam(defaultValue = "10") int count) {
-        return filmStorage.getPopularFilms(count);
+        return filmService.getPopularFilms(count);
     }
 
     /**
@@ -62,7 +60,7 @@ public class FilmController {
      */
     @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) {
-        return filmStorage.createFilm(film);
+        return filmService.createFilm(film);
     }
 
     /**
@@ -73,7 +71,7 @@ public class FilmController {
      */
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film newFilm) {
-        return filmStorage.updateFilm(newFilm);
+        return filmService.updateFilm(newFilm);
     }
 
     /**

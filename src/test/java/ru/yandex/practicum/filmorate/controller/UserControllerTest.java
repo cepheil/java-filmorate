@@ -7,7 +7,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -28,13 +27,10 @@ import static org.mockito.Mockito.*;
  *     <li>Поиск общих друзей между двумя пользователями</li>
  * </ul>
  *
- * <p>Для тестирования используются моки ({@link Mock}) объектов {@link UserStorage} и {@link UserService},
+ * <p>Для тестирования используется мок ({@link Mock}) объекта {@link UserService},
  * а тестируемый класс ({@link UserController}) внедряется через {@link InjectMocks}.</p>
  */
 public class UserControllerTest {
-
-    @Mock
-    private UserStorage userStorage;
 
     @Mock
     private UserService userService;
@@ -50,7 +46,7 @@ public class UserControllerTest {
     /**
      * Проверяет, что метод {@link UserController#findAllUsers()} возвращает список всех пользователей.
      *
-     * <p>Ожидается, что вызов делегируется в {@link UserStorage#findAllUsers()}</p>
+     * <p>Ожидается, что вызов делегируется в {@link UserService#findAllUsers()}</p>
      */
     @Test
     public void testFindAllUsers() {
@@ -58,12 +54,12 @@ public class UserControllerTest {
         User user2 = new User();
         Collection<User> users = Arrays.asList(user1, user2);
 
-        when(userStorage.findAllUsers()).thenReturn(users);
+        when(userService.findAllUsers()).thenReturn(users);
 
         Collection<User> result = userController.findAllUsers();
 
         assertEquals(2, result.size());
-        verify(userStorage, times(1)).findAllUsers();
+        verify(userService, times(1)).findAllUsers();
     }
 
     /**
@@ -109,35 +105,35 @@ public class UserControllerTest {
     /**
      * Проверяет, что метод {@link UserController#createUser(User)} корректно создаёт нового пользователя.
      *
-     * <p>Ожидается, что вызов делегируется в {@link UserStorage#createUser(User)}</p>
+     * <p>Ожидается, что вызов делегируется в {@link UserService#createUser(User)}</p>
      */
     @Test
     public void testCreateUser() {
         User user = new User();
 
-        when(userStorage.createUser(user)).thenReturn(user);
+        when(userService.createUser(user)).thenReturn(user);
 
         User result = userController.createUser(user);
 
         assertEquals(user, result);
-        verify(userStorage, times(1)).createUser(user);
+        verify(userService, times(1)).createUser(user);
     }
 
     /**
      * Проверяет, что метод {@link UserController#updateUser(User)} корректно обновляет данные существующего пользователя.
      *
-     * <p>Ожидается, что вызов делегируется в {@link UserStorage#updateUser(User)}</p>
+     * <p>Ожидается, что вызов делегируется в {@link UserService#updateUser(User)}</p>
      */
     @Test
     public void testUpdateUser() {
         User user = new User();
 
-        when(userStorage.updateUser(user)).thenReturn(user);
+        when(userService.updateUser(user)).thenReturn(user);
 
         User result = userController.updateUser(user);
 
         assertEquals(user, result);
-        verify(userStorage, times(1)).updateUser(user);
+        verify(userService, times(1)).updateUser(user);
     }
 
     /**
