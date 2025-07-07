@@ -5,8 +5,8 @@ import lombok.Data;
 import ru.yandex.practicum.filmorate.annotation.ValidLogin;
 
 import java.time.LocalDate;
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Класс {@code User} представляет модель пользователя.
@@ -45,5 +45,5 @@ public class User {
     @NotNull(message = "Дата рождения не может быть пустой")
     @PastOrPresent(message = "Дата рождения не может быть в будущем")
     private LocalDate birthday;
-    private Collection<Long> friends = new HashSet<>();
+    private Set<Long> friends = new HashSet<>();
 }

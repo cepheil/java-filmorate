@@ -72,7 +72,7 @@ public class InMemoryUserStorage implements UserStorage {
             log.error("Такой email уже существует: {}", user.getEmail());
             throw new DuplicatedDataException("Email уже используется.");
         }
-        user.setId(Long.valueOf(idCounter.getAndIncrement()));
+        user.setId(idCounter.getAndIncrement());
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
             log.debug("Замена пустого имени на логин: {}", user.getLogin());

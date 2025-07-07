@@ -5,8 +5,8 @@ import lombok.Data;
 import ru.yandex.practicum.filmorate.annotation.MinReleaseDate;
 
 import java.time.LocalDate;
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Класс {@code Film} представляет модель фильма, которая содержит информацию о фильме, включая:
@@ -44,5 +44,5 @@ public class Film {
     private LocalDate releaseDate;
     @Positive(message = "продолжительность фильма должна быть положительным числом, в минутах")
     private Integer duration;
-    private Collection<Long> likes = new HashSet<>();
+    private Set<Long> likes = new HashSet<>();
 }

@@ -76,7 +76,7 @@ public class InMemoryFilmStorage implements FilmStorage {
             log.error("Такое название уже существует: {}", film.getName());
             throw new DuplicatedDataException("Фильм с таким названием уже существует.");
         }
-        film.setId(Long.valueOf(idCounter.getAndIncrement()));
+        film.setId(idCounter.getAndIncrement());
         films.put(film.getId(), film);
         log.info("Фильм создан: ID={}", film.getId());
         return film;
