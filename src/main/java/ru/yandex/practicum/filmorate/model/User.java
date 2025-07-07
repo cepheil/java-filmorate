@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.model;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
-import ru.yandex.practicum.filmorate.annotation.ValidBirthday;
 import ru.yandex.practicum.filmorate.annotation.ValidLogin;
 
 import java.time.LocalDate;
@@ -30,7 +29,7 @@ import java.util.HashSet;
  *     <li>{@link NotNull} — поле {@code login} обязательно для заполнения</li>
  *     <li>{@link ValidLogin} — проверяет, что логин содержит только буквы и цифры и не имеет пробелов</li>
  *     <li>{@link NotNull} — поле {@code birthday} обязательно для заполнения</li>
- *     <li>{@link ValidBirthday} — гарантирует, что дата рождения не в будущем</li>
+ *     <li>{@link PastOrPresent} — гарантирует, что дата рождения не в будущем</li>
  * </ul>
  */
 @Data
@@ -44,7 +43,7 @@ public class User {
     @ValidLogin
     private String login;
     @NotNull(message = "Дата рождения не может быть пустой")
-    @ValidBirthday
+    @PastOrPresent(message = "Дата рождения не может быть в будущем")
     private LocalDate birthday;
     private Collection<Long> friends = new HashSet<>();
 }
