@@ -70,12 +70,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film createFilm(Film film) {
         log.info("POST /films - попытка добавления фильма: {}", film.getName());
-        if (films.values()
-                .stream()
-                .anyMatch(f -> f.getName().equalsIgnoreCase(film.getName()))) {
-            log.error("Такое название уже существует: {}", film.getName());
-            throw new DuplicatedDataException("Фильм с таким названием уже существует.");
-        }
+        validateUniqueFilmName(film);
         film.setId(idCounter.getAndIncrement());
         films.put(film.getId(), film);
         log.info("Фильм создан: ID={}", film.getId());
@@ -100,17 +95,13 @@ public class InMemoryFilmStorage implements FilmStorage {
             log.error("Отсутствует фильм с ID: {}", newFilm.getId());
             throw new NotFoundException("Фильм с ID " + newFilm.getId() + " не найден.");
         }
-        if (!newFilm.getName().equalsIgnoreCase(existingFilm.getName()) &&
-                films.values()
-                        .stream()
-                        .anyMatch(film -> film.getName().equalsIgnoreCase(newFilm.getName()))) {
-            log.error("Такое название уже существует: {}", newFilm.getName());
-            throw new DuplicatedDataException("Фильм с таким названием уже существует.");
+        if (!newFilm.getName().equalsIgnoreCase(existingFilm.getName())) {
+            validateUniqueFilmName(newFilm);
         }
         existingFilm.setName(newFilm.getName());
-        Optional.ofNullable(newFilm.getDescription()).ifPresent(existingFilm::setDescription);
-        Optional.ofNullable(newFilm.getReleaseDate()).ifPresent(existingFilm::setReleaseDate);
-        Optional.ofNullable(newFilm.getDuration()).ifPresent(existingFilm::setDuration);
+        existingFilm.setDescription(newFilm.getDescription());
+        existingFilm.setReleaseDate(newFilm.getReleaseDate());
+        existingFilm.setDuration(newFilm.getDuration());
         return existingFilm;
     }
 
@@ -140,5 +131,20 @@ public class InMemoryFilmStorage implements FilmStorage {
                 .sorted((f1, f2) -> Integer.compare(f2.getLikes().size(), f1.getLikes().size()))
                 .limit(count)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Проверяет, что фильм с таким названием ещё не существует.
+     *
+     * @param film объект фильма для проверки
+     * @throws DuplicatedDataException если название занято
+     */
+    private void validateUniqueFilmName(Film film) {
+        if (films.values()
+                .stream()
+                .anyMatch(f -> f.getName().equalsIgnoreCase(film.getName()))) {
+            log.error("Такое название уже существует: {}", film.getName());
+            throw new DuplicatedDataException("Фильм с таким названием уже существует.");
+        }
     }
 }
