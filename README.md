@@ -67,3 +67,91 @@ java -jar target/filmorate-0.0.1-SNAPSHOT.jar
 |GET|	/users/{id}/friends|	Список друзей|	Проверка ID|	-|
 |GET|	/users/{id}/friends/common/{otherId}|	Общие друзья|	Проверка обоих ID|	-|
 
+
+---
+
+
+#🔑 Ключевые компоненты
+## Слои:
+
+### Controller:
+
+1. Принимает HTTP-запросы
+
+2. Валидирует входные данные (@Valid)
+
+3. Возвращает HTTP-ответы
+
+### Service:
+
+1. Содержит бизнес-логику (дружба, лайки)
+
+2. Проверяет права доступа
+
+3. Работает через интерфейсы Storage
+
+### Storage:
+
+1. In-memory реализация (HashMap)
+
+2. Выполняет CRUD-операции
+
+### Валидация:
+
+1. Аннотации (@NotBlank, @Size, @PastOrPresent)
+
+### Кастомные проверки:
+
+1. Дата релиза фильма ≥ 28.12.1895 (@MinReleaseDate)
+
+2. Запрет самодружбы в UserService.addFriend()
+
+### Обработка ошибок:
+
+1. @ExceptionHandler в контроллерах
+
+### Кастомные исключения:
+
+1. NotFoundException (404)
+
+2. ValidationException (400)
+
+3. DuplicatedDataException (409)
+
+### Логирование:
+
+1. Logbook для HTTP-запросов/ответов
+
+2. SLF4J для бизнес-событий (добавление друзей, лайков)
+
+
+---
+
+
+# 💡 Примеры кода
+## 🧑‍🤝‍🧑 Добавление друга (UserService)
+
+```java
+public void addFriend(Long userId, Long friendId) {
+    if (userId.equals(friendId)) {
+        throw new ValidationException("Нельзя добавить себя в друзья");
+    }
+    User user = userStorage.getById(userId);
+    User friend = userStorage.getById(friendId);
+    user.getFriends().add(friendId);
+    friend.getFriends().add(userId); // Двусторонняя дружба
+    userStorage.save(user);
+    userStorage.save(friend);
+}
+```
+
+## ✔️ Валидация фильма (Film)
+```java
+@Data
+public class Film {
+    @NotBlank private String name;
+    @Size(max = 200) private String description;
+    @MinReleaseDate private LocalDate releaseDate;
+    @Positive private int duration;
+}
+```
