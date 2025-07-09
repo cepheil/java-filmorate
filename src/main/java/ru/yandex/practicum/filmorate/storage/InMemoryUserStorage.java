@@ -66,12 +66,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User createUser(User user) {
         log.info("POST /users - попытка добавления пользователя: {}", user.getEmail());
-        if (users.values()
-                .stream()
-                .anyMatch(u -> u.getEmail().equalsIgnoreCase(user.getEmail()))) {
-            log.error("Такой email уже существует: {}", user.getEmail());
-            throw new DuplicatedDataException("Email уже используется.");
-        }
+        validateUniqueUserEmail(user);
         user.setId(idCounter.getAndIncrement());
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
@@ -100,12 +95,8 @@ public class InMemoryUserStorage implements UserStorage {
             log.error("Отсутствует пользователь с ID: {}", newUser.getId());
             throw new NotFoundException("Пользователь с ID " + newUser.getId() + " не найден.");
         }
-        if (!newUser.getEmail().equalsIgnoreCase(existingUser.getEmail()) &&
-                users.values()
-                        .stream()
-                        .anyMatch(user -> user.getEmail().equalsIgnoreCase(newUser.getEmail()))) {
-            log.error("Такой email уже существует: {}", newUser.getEmail());
-            throw new DuplicatedDataException("Email уже используется.");
+        if (!newUser.getEmail().equalsIgnoreCase(existingUser.getEmail())) {
+            validateUniqueUserEmail(newUser);
         }
         existingUser.setEmail(newUser.getEmail());
         existingUser.setLogin(newUser.getLogin());
@@ -127,5 +118,20 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User getUserById(Long id) {
         return users.get(id);
+    }
+
+    /**
+     * Проверяет, что пользователь с таким email ещё не существует.
+     *
+     * @param user объект пользователя для проверки
+     * @throws DuplicatedDataException если название занято
+     */
+    private void validateUniqueUserEmail(User user) {
+        if (users.values()
+                .stream()
+                .anyMatch(u -> u.getEmail().equalsIgnoreCase(user.getEmail()))) {
+            log.error("Такой email уже существует: {}", user.getEmail());
+            throw new DuplicatedDataException("Email уже используется.");
+        }
     }
 }
