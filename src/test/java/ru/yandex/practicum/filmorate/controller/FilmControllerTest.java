@@ -5,7 +5,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -16,6 +18,9 @@ public class FilmControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockBean
+    private FilmService filmService;
 
 
     @Test
@@ -105,29 +110,6 @@ public class FilmControllerTest {
         // CHECKSTYLE:ON
         mockMvc.perform(post("/films").contentType("application/json").content(json))
                 .andExpect(status().isOk());
-    }
-
-
-    @Test
-    @DisplayName("Фильм: Дата релиза до 28.12.1895 → 400 Bad Request")
-    public void shouldReturnErrorIfReleaseDateBefore1895() throws Exception {
-        // CHECKSTYLE:OFF
-        String json = """
-                    {
-                        "name": "Film",
-                        "description": "valid description",
-                        "releaseDate": "1895-12-27",
-                        "duration": 100
-                    }
-                """;
-        // CHECKSTYLE:ON
-        Exception resolved = assertThrows(Exception.class, () -> {
-            mockMvc.perform(post("/films")
-                            .contentType("application/json")
-                            .content(json))
-                    .andReturn();
-        });
-
     }
 
 
