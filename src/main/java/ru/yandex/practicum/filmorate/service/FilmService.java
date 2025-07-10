@@ -47,7 +47,7 @@ public class FilmService {
         log.info("//GET /films/popular?count={count}  Получение списка из {} популярных фильмов", count);
         return filmStorage.getAllFilms()
                 .stream()
-                .sorted((f1, f2) -> Integer.compare(f1.getLikes().size(), f2.getLikes().size()))
+                .sorted((f1, f2) -> Integer.compare(f2.getLikes().size(), f1.getLikes().size()))
                 .limit(count)
                 .collect(Collectors.toList());
     }
