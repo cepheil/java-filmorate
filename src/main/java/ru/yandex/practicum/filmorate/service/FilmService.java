@@ -42,7 +42,7 @@ public class FilmService {
      */
     public void addLike(Long filmId, Long userId) {
         Film film = filmStorage.getFilmById(filmId);
-        if (filmStorage.getFilmById(filmId) == null) {
+        if (film == null) {
             throw new NotFoundException("Фильм не найден.");
         }
         User user = userStorage.getUserById(userId);
