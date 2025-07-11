@@ -32,7 +32,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film getFilmById(Long id) {
-        log.info("GET /films/{filmId} - получение списка всех фильмов");
+        log.info("GET /films/{filmId} - получение фильма по его ID");
         Film film = films.get(id);
         if (film == null) {
             log.error("Ошибка: фильм с Id: {} не найден", id);
@@ -45,8 +45,9 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film createFilm(Film film) {
         log.info("POST /films добавление фильма: {}", film.getName());
+        String lcName = film.getName().trim().toLowerCase();
         for (Film f : films.values()) {
-            if (f.getName().equals(film.getName()) && f.getReleaseDate().equals(film.getReleaseDate())) {
+            if (f.getName().trim().toLowerCase().equals(lcName) && f.getReleaseDate().equals(film.getReleaseDate())) {
                 log.error("Ошибка: Такой фильм уже существует {}, релиз: {}", film.getName(), film.getReleaseDate());
                 throw new DuplicatedDataException("Такое название уже существует");
             }
@@ -55,7 +56,6 @@ public class InMemoryFilmStorage implements FilmStorage {
             log.error("Ошибка: дата релиза раньше 28 декабря 1895 года: {}", film.getReleaseDate());
             throw new ValidationException("дата релиза — не раньше 28 декабря 1895 года");
         }
-
         film.setId(getNextId());
         films.put(film.getId(), film);
         log.info("Фильм: {} , ID: {} , добавлен!", film.getName(), film.getId());
@@ -79,9 +79,13 @@ public class InMemoryFilmStorage implements FilmStorage {
             log.error("Ошибка: дата релиза раньше 28 декабря 1895 года: {}", newFilm.getReleaseDate());
             throw new ValidationException("дата релиза — не раньше 28 декабря 1895 года");
         }
-        if (newFilm.getName() != null && !newFilm.getName().equals(existingFilm.getName())) {
+        String newFilmName = newFilm.getName().trim().toLowerCase();
+        String existingFilmName = existingFilm.getName().trim().toLowerCase();
+
+        if (newFilmName != null && !newFilmName.equals(existingFilmName)) {
             for (Film f : films.values()) {
-                if (!f.getId().equals(existingFilm.getId()) && f.getName().equals(newFilm.getName()) &&
+                if (!f.getId().equals(existingFilm.getId()) &&
+                        f.getName().trim().toLowerCase().equals(newFilmName) &&
                         f.getReleaseDate().equals(newFilm.getReleaseDate())) {
                     log.error("Ошибка: Такой фильм уже существует: {}, релиз: {}",
                             newFilm.getName(), newFilm.getReleaseDate());

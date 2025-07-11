@@ -41,13 +41,12 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User createUser(User user) {
         log.info("POST /users добавление пользователя: {}", user.getName());
-
         if (user.getEmail() == null) {
             log.error("Ошибка: Email не может быть пустым");
             throw new ValidationException("Email не может быть пустым");
         }
         for (User u : users.values()) {
-            if (u.getEmail().equals(user.getEmail())) {
+            if (u.getEmail().trim().equalsIgnoreCase(user.getEmail().trim())) {
                 log.error("Ошибка: Этот Email уже используется {}", user.getEmail());
                 throw new DuplicatedDataException("Этот Email уже используется");
             }
@@ -74,9 +73,10 @@ public class InMemoryUserStorage implements UserStorage {
             log.error("Ошибка: Пользователь с Id: {} не найден", newUser.getId());
             throw new NotFoundException("Пользователь с Id = " + newUser.getId() + " не найден");
         }
-        if (newUser.getEmail() != null && !newUser.getEmail().equals(existingUser.getEmail())) {
+        if (newUser.getEmail() != null && !newUser.getEmail().trim().equalsIgnoreCase(existingUser.getEmail().trim())) {
             for (User u : users.values()) {
-                if (!u.getId().equals(existingUser.getId()) && u.getEmail().equals(newUser.getEmail())) {
+                if (!u.getId().equals(existingUser.getId()) &&
+                        u.getEmail().trim().equalsIgnoreCase(newUser.getEmail().trim())) {
                     log.error("Ошибка: Этот Email уже используется {}", newUser.getEmail());
                     throw new DuplicatedDataException("Этот Email уже используется");
                 }
