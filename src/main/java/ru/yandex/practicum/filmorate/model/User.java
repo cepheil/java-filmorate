@@ -5,8 +5,8 @@ import lombok.Data;
 import ru.yandex.practicum.filmorate.annotation.ValidLogin;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Класс {@code User} представляет модель пользователя.
@@ -19,7 +19,7 @@ import java.util.Set;
  *     <li>{@link #email} — адрес электронной почты (обязательное поле, должно соответствовать формату email)</li>
  *     <li>{@link #login} — уникальный логин пользователя (не может быть пустым и не должен содержать пробелов)</li>
  *     <li>{@link #birthday} — дата рождения пользователя (не может быть пустой и не должна быть в будущем)</li>
- *     <li>{@link #friends} — коллекция ID друзей пользователя</li>
+ *     <li>{@link #friends} — коллекция ID друзей с указанием статуса дружбы</li>
  * </ul>
  *
  * <p>Валидация:</p>
@@ -30,6 +30,13 @@ import java.util.Set;
  *     <li>{@link ValidLogin} — проверяет, что логин содержит только буквы и цифры и не имеет пробелов</li>
  *     <li>{@link NotNull} — поле {@code birthday} обязательно для заполнения</li>
  *     <li>{@link PastOrPresent} — гарантирует, что дата рождения не в будущем</li>
+ * </ul>
+ *
+ * <h2>Дружба между пользователями</h2>
+ * <p>Связь «дружба» имеет следующие статусы:</p>
+ * <ul>
+ *     <li><b>PENDING</b> — запрос на добавление в друзья отправлен, но не подтвержден</li>
+ *     <li><b>CONFIRMED</b> — дружба подтверждена, пользователи считаются друзьями</li>
  * </ul>
  */
 @Data
@@ -45,5 +52,5 @@ public class User {
     @NotNull(message = "Дата рождения не может быть пустой")
     @PastOrPresent(message = "Дата рождения не может быть в будущем")
     private LocalDate birthday;
-    private Set<Long> friends = new HashSet<>();
+    private Map<Long, FriendshipStatus> friends = new HashMap<>();
 }
