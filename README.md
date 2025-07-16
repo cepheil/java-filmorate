@@ -1,4 +1,4 @@
-![Диаграмма базы данных Filmorate](images/FilmorateDatabase.png)
+![Диаграмма](images/FilmorateDatabase.png?raw=true)
 
 # Filmorate 🎬
 
