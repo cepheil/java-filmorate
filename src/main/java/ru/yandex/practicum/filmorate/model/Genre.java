@@ -23,7 +23,7 @@ import lombok.Data;
  */
 @Data
 public class Genre {
-    private Long id;
+    private int id;
     @NotBlank(message = "Жанр не может быть пустым")
     private String name;
 }
