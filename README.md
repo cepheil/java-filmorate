@@ -1,3 +1,5 @@
+![Диаграмма базы данных Filmorate](images/Filmorate%20database.png)
+
 # Filmorate 🎬
 
 ## О проекте
