@@ -1,5 +1,3 @@
-[Диаграмма](images/FilmorateDatabase.png)
-
 # Filmorate 🎬
 
 ## О проекте
