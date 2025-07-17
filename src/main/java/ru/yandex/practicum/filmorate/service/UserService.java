@@ -188,6 +188,13 @@ public class UserService {
     }
 
     /**
+     * Возвращает пользователя по ID.
+     */
+    public User getUserById(Long id) {
+        return userStorage.getUserById(id);
+    }
+
+    /**
      * Создаёт нового пользователя.
      */
     public User createUser(User user) {

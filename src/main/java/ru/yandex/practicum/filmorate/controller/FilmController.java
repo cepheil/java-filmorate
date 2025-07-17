@@ -53,6 +53,14 @@ public class FilmController {
     }
 
     /**
+     * Возвращает доступный фильм по ID.
+     */
+    @GetMapping("/{id}")
+    public Film getFilmById(@PathVariable Long id) {
+        return filmService.getFilmById(id);
+    }
+
+    /**
      * Добавляет новый фильм в систему.
      *
      * @param film объект фильма, переданный в теле запроса

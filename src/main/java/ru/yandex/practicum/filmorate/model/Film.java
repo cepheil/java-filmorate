@@ -51,6 +51,7 @@ public class Film {
     @Positive(message = "Продолжительность фильма должна быть положительным числом, в минутах")
     private int duration;
     private Set<Long> likes = new HashSet<>();
+    @NotEmpty(message = "Фильм должен содержать хотя бы один жанр")
     private List<Genre> genres = new ArrayList<>();
     @NotNull(message = "Рейтинг MPA не может быть пустой")
     private MpaRating mpa;

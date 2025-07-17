@@ -91,6 +91,18 @@ public class UserController {
     }
 
     /**
+     * Возвращает зарегистрированного пользователя по ID.
+     *
+     * <p>Доступ по адресу: {@code GET /users/id}</p>
+     *
+     * @return коллекция объектов типа {@link User}
+     */
+    @GetMapping("/{id}")
+    public User getUserById(@PathVariable Long id) {
+        return userService.getUserById(id);
+    }
+
+    /**
      * Создаёт нового пользователя.
      *
      * <p>Доступ по адресу: {@code POST /users}</p>

@@ -86,6 +86,13 @@ public class FilmService {
     }
 
     /**
+     * Возвращает фильм по ID.
+     */
+    public Film getFilmById(Long id) {
+        return filmStorage.getFilmById(id);
+    }
+
+    /**
      * Создаёт новый фильм.
      */
     public Film createFilm(Film film) {
