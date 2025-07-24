@@ -9,4 +9,8 @@ public class RatingMpa {
     @NotBlank(message = "name не может быть пустым")
     private String name;
 
+    public RatingMpa(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 }

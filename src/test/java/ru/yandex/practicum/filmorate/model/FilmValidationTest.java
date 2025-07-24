@@ -16,6 +16,7 @@ import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -37,6 +38,8 @@ public class FilmValidationTest {
         film.setDescription("Movie without name");
         film.setReleaseDate(LocalDate.of(2020, 1, 1));
         film.setDuration(100L);
+        film.setGenres(List.of(new Genre(1L, "Комедия")));
+        film.setRating(new RatingMpa(1L, "G"));
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertTrue(violations.stream()
@@ -52,6 +55,8 @@ public class FilmValidationTest {
         film.setDescription("A".repeat(201)); // создаем описание = 201 символ
         film.setReleaseDate(LocalDate.of(2020, 1, 1));
         film.setDuration(100L);
+        film.setGenres(List.of(new Genre(1L, "Комедия")));
+        film.setRating(new RatingMpa(1L, "G"));
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertTrue(violations.stream()
@@ -67,6 +72,8 @@ public class FilmValidationTest {
         film.setDescription("Valid description");
         film.setReleaseDate(LocalDate.of(2000, 1, 1));
         film.setDuration(-10L);  // отрицательная продолжительность
+        film.setGenres(List.of(new Genre(1L, "Комедия")));
+        film.setRating(new RatingMpa(1L, "G"));
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertTrue(violations.stream()
@@ -82,6 +89,8 @@ public class FilmValidationTest {
         film.setDescription("Valid description");
         film.setReleaseDate(LocalDate.of(2000, 1, 1));
         film.setDuration(0L); // "нулевая" продолжительность
+        film.setGenres(List.of(new Genre(1L, "Комедия")));
+        film.setRating(new RatingMpa(1L, "G"));
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertTrue(violations.stream()
@@ -97,6 +106,8 @@ public class FilmValidationTest {
         film.setDescription("Valid description");
         film.setReleaseDate(LocalDate.of(2020, 1, 1));
         film.setDuration(100L);
+        film.setGenres(List.of(new Genre(1L, "Комедия")));
+        film.setRating(new RatingMpa(1L, "G"));
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertTrue(violations.isEmpty());  // нет ошибок - корректные данные.
@@ -111,6 +122,8 @@ public class FilmValidationTest {
         film.setDescription("Valid description");
         film.setReleaseDate(null);  // дата релиза не указана
         film.setDuration(100L);
+        film.setGenres(List.of(new Genre(1L, "Комедия")));
+        film.setRating(new RatingMpa(1L, "G"));
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertTrue(violations.stream()
@@ -126,6 +139,8 @@ public class FilmValidationTest {
         film.setDescription("Valid description");
         film.setReleaseDate(LocalDate.of(1895, 12, 27));
         film.setDuration(100L);
+        film.setGenres(List.of(new Genre(1L, "Комедия")));
+        film.setRating(new RatingMpa(1L, "G"));
 
         FilmStorage filmStorage = new InMemoryFilmStorage();
         UserStorage userStorage = new InMemoryUserStorage();

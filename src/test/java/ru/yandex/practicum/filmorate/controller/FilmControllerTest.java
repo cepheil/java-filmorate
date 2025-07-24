@@ -31,7 +31,9 @@ public class FilmControllerTest {
                         "name": "",
                         "description": "valid description",
                         "releaseDate": "2020-01-01",
-                        "duration": 100
+                        "duration": 100,
+                        "genres": [{"id": 1, "name": "Комедия"}],
+                        "rating": {"id": 1, "name": "G"}
                     }
                 """;
         // CHECKSTYLE:ON
@@ -50,7 +52,9 @@ public class FilmControllerTest {
                         "name": "Film",
                         "description": "%s",
                         "releaseDate": "2020-01-01",
-                        "duration": 100
+                        "duration": 100,
+                        "genres": [{"id": 1, "name": "Комедия"}],
+                        "rating": {"id": 1, "name": "G"}
                     }
                 """.formatted("a".repeat(201));
         // CHECKSTYLE:ON
@@ -68,7 +72,9 @@ public class FilmControllerTest {
                         "name": "Film",
                         "description": "valid description",
                         "releaseDate": "2020-01-01",
-                        "duration": -10
+                        "duration": -10,
+                        "genres": [{"id": 1, "name": "Комедия"}],
+                        "rating": {"id": 1, "name": "G"}
                     }
                 """;
         // CHECKSTYLE:ON
@@ -85,7 +91,9 @@ public class FilmControllerTest {
                         "name": "Film",
                         "description": "valid description",
                         "releaseDate": "2020-01-01",
-                        "duration": 0
+                        "duration": 0,
+                        "genres": [{"id": 1, "name": "Комедия"}],
+                        "rating": {"id": 1, "name": "G"}
                     }
                 """;
         // CHECKSTYLE:ON
@@ -103,7 +111,9 @@ public class FilmControllerTest {
                         "name": "Film",
                         "description": "valid description",
                         "releaseDate": "2020-01-01",
-                        "duration": 100
+                        "duration": 100,
+                        "genres": [{"id": 1, "name": "Комедия"}],
+                        "rating": {"id": 1, "name": "G"}
                     }
                 """;
         // CHECKSTYLE:ON
@@ -121,6 +131,43 @@ public class FilmControllerTest {
         mockMvc.perform(post("/films").contentType("application/json").content(json))
                 .andExpect(status().isBadRequest());
 
+    }
+
+    @Test
+    @DisplayName("Фильм: Пустой список жанров → 400 Bad Request")
+    public void shouldReturnErrorIfGenresEmpty() throws Exception {
+        // CHECKSTYLE:OFF
+        String json = """
+                    {
+                        "name": "Film",
+                        "description": "valid description",
+                        "releaseDate": "2020-01-01",
+                        "duration": 100,
+                        "genres": [],
+                        "rating": {"id": 1, "name": "G"}
+                    }
+                """;
+        // CHECKSTYLE:ON
+        mockMvc.perform(post("/films").contentType("application/json").content(json))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Фильм: Отсутствует рейтинг → 400 Bad Request")
+    public void shouldReturnErrorIfRatingIsMissing() throws Exception {
+        // CHECKSTYLE:OFF
+        String json = """
+                    {
+                        "name": "Film",
+                        "description": "valid description",
+                        "releaseDate": "2020-01-01",
+                        "duration": 100,
+                        "genres": [{"id": 1, "name": "Комедия"}]
+                    }
+                """;
+        // CHECKSTYLE:ON
+        mockMvc.perform(post("/films").contentType("application/json").content(json))
+                .andExpect(status().isBadRequest());
     }
 
 
