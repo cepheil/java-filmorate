@@ -4,12 +4,17 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.FriendshipStatus;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static ru.yandex.practicum.filmorate.model.FriendshipStatus.*;
 
 
 @Slf4j
@@ -47,9 +52,51 @@ public class UserService {
                 userId, friendId);
         User user = checkUserExists(userId);
         User friend = checkUserExists(friendId);
-        user.getFriends().add(friendId);
-        friend.getFriends().add(userId);
-        log.info("Пользователи: {} и {}  -  добавлены в друзья", user.getName(), friend.getName());
+
+        if (userId.equals(friendId)) {
+            throw new ValidationException("Нельзя добавить самого себя в друзья.");
+        }
+
+
+        if (user.getFriends().containsKey(friendId)) {
+            FriendshipStatus status = user.getFriends().get(friendId);
+            if (status == PENDING) {
+                log.warn("Запрос на дружбу уже отправлен пользователю {}", friendId);
+                return;
+            }
+            if (status == CONFIRMED) {
+                log.warn("Пользователи {} и {} уже друзья", userId, friendId);
+                return;
+            }
+        }
+
+        if (friend.getFriends().containsKey(userId) && friend.getFriends().get(userId) == PENDING) {
+            user.getFriends().put(friendId, CONFIRMED);
+            friend.getFriends().put(userId, CONFIRMED);
+
+            log.info("Дружба между {} и {} подтверждена", userId, friendId);
+        } else {
+            user.getFriends().put(friendId, PENDING);
+            friend.getFriends().put(userId, REQUEST_RECEIVED);
+            log.info("Пользователь {} отправил запрос на дружбу пользователю {}", user.getName(), friend.getName());
+        }
+
+    }
+
+    public void confirmFriend(Long userId, Long friendId) {
+        User user = checkUserExists(userId);
+        User friend = checkUserExists(friendId);
+
+        // Проверка существования запроса
+        if (!user.getFriends().containsKey(friendId)
+                || user.getFriends().get(friendId) != REQUEST_RECEIVED) {
+            throw new ConditionsNotMetException("Запрос на дружбу не найден");
+        }
+
+        user.getFriends().put(friendId, CONFIRMED);
+        friend.getFriends().put(userId, CONFIRMED);
+
+        log.info("Пользователь {} подтвердил дружбу с {}", userId, friendId);
     }
 
 
@@ -68,10 +115,12 @@ public class UserService {
         log.info("GET /users/{id}/friends - Получение списка друзей пользователя: {}", id);
         User user = checkUserExists(id);
         return user.getFriends()
+                .entrySet()
                 .stream()
-                .map(userStorage::getUserById)
+                .filter(e -> e.getValue() == CONFIRMED)
+                .map(e -> userStorage.getUserById(e.getKey()))
                 .filter(Objects::nonNull)
-                .sorted(Comparator.comparing(User::getId))
+                .sorted(Comparator.comparingLong(User::getId))
                 .collect(Collectors.toList());
     }
 
@@ -81,10 +130,19 @@ public class UserService {
                 id, otherId);
         User user = checkUserExists(id);
         User otherUser = checkUserExists(otherId);
-        Set<Long> userFriends = user.getFriends();
-        Set<Long> otherUserFriends = otherUser.getFriends();
-        Set<Long> commonFriendIds = new HashSet<>(userFriends);
-        commonFriendIds.retainAll(otherUserFriends);
+
+        Set<Long> confirmedFriendsOfUser = user.getFriends().entrySet().stream()
+                .filter(e -> e.getValue() == CONFIRMED)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
+
+        Set<Long> confirmedFriendsOfOther = otherUser.getFriends().entrySet().stream()
+                .filter(e -> e.getValue() == CONFIRMED)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
+
+        Set<Long> commonFriendIds = new HashSet<>(confirmedFriendsOfUser);
+        commonFriendIds.retainAll(confirmedFriendsOfOther);
         return commonFriendIds.stream()
                 .map(userStorage::getUserById)
                 .filter(Objects::nonNull)

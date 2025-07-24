@@ -43,12 +43,24 @@ public class UserController {
         return userService.updateUser(newUser);
     }
 
-
-    //PUT /users/{id}/friends/{friendId}
+    /*
+    PUT /users/{userId}/friends/{friendId}
+    userId - кто отправляет запрос
+    friendId - кому отправляют запрос
+    */
     @PutMapping("/{userId}/friends/{friendId}")
     public void addFriend(@PathVariable @Positive Long userId,
                           @PathVariable @Positive Long friendId) {
         userService.addFriend(userId, friendId);
+    }
+
+
+    @PutMapping("/users/{userId}/friends/{friendId}/confirm")
+    public void confirmFriendship(
+            @PathVariable Long userId,
+            @PathVariable Long friendId
+    ) {
+        userService.confirmFriend(userId, friendId);
     }
 
 
