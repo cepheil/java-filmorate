@@ -7,7 +7,7 @@ MERGE INTO ratings_mpa (mpa_id, name) KEY(name) VALUES (4, 'R');            -- R
 MERGE INTO ratings_mpa (mpa_id, name) KEY(name) VALUES (5, 'NC-17');        -- Adults Only
 
 
--- Предустановленные жанры
+-- Предустановленные жанры фильмов
 MERGE INTO genres (genre_id, name) VALUES (1, 'Комедия');
 MERGE INTO genres (genre_id, name) VALUES (2, 'Драма');
 MERGE INTO genres (genre_id, name) VALUES (3, 'Триллер');
