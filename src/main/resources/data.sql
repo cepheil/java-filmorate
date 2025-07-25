@@ -15,4 +15,7 @@ MERGE INTO genres (genre_id, name) VALUES (4, 'Боевик');
 MERGE INTO genres (genre_id, name) VALUES (5, 'Ужасы');
 MERGE INTO genres (genre_id, name) VALUES (6, 'Фантастика');
 MERGE INTO genres (genre_id, name) VALUES (7, 'Документальный');
-MERGE INTO genres (genre_id, name) VALUES (8, 'Мультфильм');
+MERGE INTO genres (genre_id, name) VALUES (9, 'Мелодрама');
+MERGE INTO genres (genre_id, name) VALUES (10, 'Детектив');
+MERGE INTO genres (genre_id, name) VALUES (11, 'Вестерн');
+MERGE INTO genres (genre_id, name) VALUES (12, 'Фэнтези');
