@@ -118,6 +118,12 @@ public class InMemoryFilmStorage implements FilmStorage {
         return films.get(id);
     }
 
+    @Override
+    public boolean deleteFilm(Long id) {
+        Film removedFilm = films.remove(id);
+        return removedFilm != null;
+    }
+
     /**
      * Возвращает список самых популярных фильмов.
      *

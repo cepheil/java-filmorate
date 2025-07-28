@@ -120,6 +120,12 @@ public class InMemoryUserStorage implements UserStorage {
         return users.get(id);
     }
 
+    @Override
+    public boolean deleteUser(Long id) {
+        User deletedUser = users.remove(id);
+        return deletedUser != null;
+    }
+
     /**
      * Проверяет, что пользователь с таким email ещё не существует.
      *
