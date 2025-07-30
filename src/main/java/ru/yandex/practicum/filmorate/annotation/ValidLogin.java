@@ -9,12 +9,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Аннотация {@code ValidLogin} применяется к полю, представляющему логин пользователя.
- * Используется для проверки того, что логин содержит только буквы и цифры и не включает пробелы.
- * Аннотация поддерживает интеграцию с Jakarta Bean Validation и работает через связанный валидатор
- * {@link ru.yandex.practicum.filmorate.validator.LoginValidator}.
- */
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = LoginValidator.class)

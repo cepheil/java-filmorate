@@ -1,6 +1,6 @@
 -- 1. Сначала заполняем таблицы без внешних ключей
 -- Рейтинги MPA
-INSERT INTO mpa_ratings (mpa_id, name, description)
+INSERT INTO mpa_ratings (mpa_id, name)
 VALUES
     (1, 'G', 'Без возрастных ограничений'),
     (2, 'PG', 'Детям рекомендуется смотреть с родителями');

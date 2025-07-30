@@ -11,21 +11,6 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Collection;
 
-/**
- * Класс {@code FilmService} содержит бизнес-логику, связанную с фильмами.
- *
- * <p>В текущей реализации:</p>
- * <ul>
- *     <li>Добавление лайка фильму от пользователя</li>
- *     <li>Удаление лайка у фильма от пользователя</li>
- * </ul>
- *
- * <p>Для работы использует:</p>
- * <ul>
- *     <li>{@link FilmStorage} — для получения и изменения данных о фильме</li>
- *     <li>{@link UserStorage} — для проверки существования пользователя</li>
- * </ul>
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -33,13 +18,6 @@ public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
 
-    /**
-     * Добавляет лайк фильму от указанного пользователя.
-     *
-     * @param filmId ID фильма, которому ставится лайк
-     * @param userId ID пользователя, который ставит лайк
-     * @throws NotFoundException если фильм или пользователь не найдены
-     */
     public void addLike(Long filmId, Long userId) {
         Film film = filmStorage.getFilmById(filmId);
         if (film == null) {
@@ -52,13 +30,6 @@ public class FilmService {
         film.getLikes().add(userId);
     }
 
-    /**
-     * Удаляет лайк у фильма от указанного пользователя.
-     *
-     * @param filmId ID фильма, у которого удаляется лайк
-     * @param userId ID пользователя, чей лайк удаляется
-     * @throws NotFoundException если фильм или пользователь не найдены
-     */
     public void removeLike(Long filmId, Long userId) {
         Film film = filmStorage.getFilmById(filmId);
         if (film == null) {
@@ -71,37 +42,22 @@ public class FilmService {
         film.getLikes().remove(userId);
     }
 
-    /**
-     * Возвращает список всех фильмов.
-     */
     public Collection<Film> findAllFilms() {
         return filmStorage.findAllFilms();
     }
 
-    /**
-     * Возвращает самые популярные фильмы (по количеству лайков).
-     */
     public Collection<Film> getPopularFilms(int count) {
         return filmStorage.getPopularFilms(count);
     }
 
-    /**
-     * Возвращает фильм по ID.
-     */
     public Film getFilmById(Long id) {
         return filmStorage.getFilmById(id);
     }
 
-    /**
-     * Создаёт новый фильм.
-     */
     public Film createFilm(Film film) {
         return filmStorage.createFilm(film);
     }
 
-    /**
-     * Обновляет данные фильма.
-     */
     public Film updateFilm(Film newFilm) {
         return filmStorage.updateFilm(newFilm);
     }
