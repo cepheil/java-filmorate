@@ -4,110 +4,53 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserRepository;
 
 import java.util.Collection;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final UserStorage userStorage;
-    private final FriendService friendService;
-
-    public void addFriend(Long userId, Long friendId) {
-        User user = userStorage.getUserById(userId).orElseThrow(() ->
-                new NotFoundException("Пользователь не найден."));
-        User friend = userStorage.getUserById(friendId).orElseThrow(() ->
-                new NotFoundException("Пользователь не найден."));
-        friendService.addFriend(user_id, friend_id);
-    }
-
-    public void removeFriend(Long userId, Long friendId) {
-        User user = userStorage.getUserById(userId);
-        if (user == null) {
-            throw new NotFoundException("Пользователь не найден.");
-        }
-        User friend = userStorage.getUserById(friendId);
-        if (friend == null) {
-            throw new NotFoundException("Пользователь не найден.");
-        }
-        user.getFriends().remove(friendId);
-        friend.getFriends().remove(userId);
-    }
-
-    public Collection<User> getFriends(Long userId) {
-        User user = userStorage.getUserById(userId);
-        if (user == null) {
-            throw new NotFoundException("Пользователь не найден.");
-        }
-        return user.getFriends()
-                .entrySet()
-                .stream()
-                .filter(e -> e.getValue() == FriendshipStatus.CONFIRMED)
-                .map(e -> userStorage.getUserById(e.getKey()))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-    }
-
-    public Collection<User> getCommonFriends(Long userId1, Long userId2) {
-        User user1 = userStorage.getUserById(userId1);
-        if (user1 == null) {
-            throw new NotFoundException("Пользователь не найден.");
-        }
-        User user2 = userStorage.getUserById(userId2);
-        if (user2 == null) {
-            throw new NotFoundException("Пользователь не найден.");
-        }
-
-        Set<Long> commonIds = user1.getFriends()
-                .entrySet()
-                .stream()
-                .filter(e -> e.getValue() == FriendshipStatus.CONFIRMED)
-                .map(Map.Entry::getKey)
-                .filter(id -> user2.getFriends().containsKey(id) &&
-                user2.getFriends().get(id) == FriendshipStatus.CONFIRMED)
-                .collect(Collectors.toSet());
-
-        return commonIds.stream()
-                .map(userStorage::getUserById)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-    }
-
-    public void confirmFriendship(Long userId, Long friendId) {
-        User user = userStorage.getUserById(userId);
-        if (user == null) {
-            throw new NotFoundException("Пользователь не найден.");
-        }
-        User friend = userStorage.getUserById(friendId);
-        if (friend == null) {
-            throw new NotFoundException("Пользователь не найден.");
-        }
-        if (user.getFriends().containsKey(friendId)) {
-            user.getFriends().put(friendId, FriendshipStatus.CONFIRMED);
-            friend.getFriends().put(userId, FriendshipStatus.CONFIRMED);
-        }
-    }
+    private final UserRepository userRepository;
 
     public Collection<User> findAllUsers() {
-        return userStorage.findAllUsers();
+        log.debug("Попытка получения списка всех пользователей.");
+        return userRepository.findAllUsers();
     }
 
-    public User getUserById(Long id) {
-        return userStorage.getUserById(id).orElseThrow(() -> new NotFoundException("Пользователь не найден."));
+    public User getUserById(Long userId) {
+        log.debug("Попытка получения пользователя по ID: {}", userId);
+        if (userId == null) {
+            throw new ValidationException("ID пользователя не может быть null.");
+        }
+        return userRepository.getUserById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с ID " + userId + " не найден."));
     }
 
     public User createUser(User user) {
-        return userStorage.createUser(user);
+        log.debug("Попытка создания нового пользователя: email={}, login={}", user.getEmail(), user.getLogin());
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
+        User createdUser = userRepository.createUser(user);
+        log.info("Создан пользователь с ID: {}", createdUser.getId());
+        return createdUser;
     }
 
     public User updateUser(User newUser) {
-        return userStorage.updateUser(newUser);
+        log.debug("Попытка обновления пользователя с ID: {}", newUser.getId());
+        if (newUser.getId() == null) {
+            throw new ValidationException("ID пользователя не может быть null.");
+        }
+        getUserById(newUser.getId());
+        if (newUser.getName() == null || newUser.getName().isBlank()) {
+            newUser.setName(newUser.getLogin());
+        }
+        User updatedUser = userRepository.updateUser(newUser);
+        log.info("Пользователь с ID {} обновлен", newUser.getId());
+        return updatedUser;
     }
 }

@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.storage.user;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Repository
 @Qualifier("userDbStorage")
-public class UserDbStorage extends BaseRepository<User> implements UserStorage {
+public class JdbcUserRepository extends BaseRepository<User> implements UserRepository {
     private static final String FIND_ALL_USERS_QUERY = "SELECT * FROM users ORDER BY user_id";
     private static final String FIND_USER_BY_ID_QUERY = "SELECT * FROM users WHERE user_id = ?";
     private static final String INSERT_USERS_QUERY = "INSERT INTO users (email, login, name, birthday)" +
@@ -21,7 +21,7 @@ public class UserDbStorage extends BaseRepository<User> implements UserStorage {
             "birthday = ? WHERE user_id = ?";
     private static final String DELETE_USER_QUERY = "DELETE FROM users WHERE user_id = ?";
 
-    public UserDbStorage(JdbcTemplate jdbc, RowMapper<User> mapper) {
+    public JdbcUserRepository(JdbcTemplate jdbc, RowMapper<User> mapper) {
         super(jdbc, mapper);
     }
 

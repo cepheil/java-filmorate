@@ -1,6 +1,6 @@
 -- 1. Сначала заполняем таблицы без внешних ключей
 -- Рейтинги MPA
-INSERT INTO mpa_ratings (mpa_id, name)
+INSERT INTO mpa_ratings (mpa_id, name, description)
 VALUES
     (1, 'G', 'Без возрастных ограничений'),
     (2, 'PG', 'Детям рекомендуется смотреть с родителями');
@@ -34,10 +34,12 @@ VALUES
     (2, 2);  -- Film 2: Драма
 
 -- Друзья
-INSERT INTO friends (user_id, friend_id)
+INSERT INTO friends (user_id, friend_id, confirmed)
 VALUES
-    (1, 2),  -- user1 добавил user2
-    (1, 3);  -- user1 добавил user3
+    (1, 2, TRUE),  -- user1 и user2 - подтвержденные друзья
+    (2, 1, TRUE),  -- обратная связь для дружбы
+    (1, 3, FALSE), -- user1 добавил user3, но не подтверждено
+    (3, 1, TRUE);  -- user3 добавил user1 и подтвердил
 
 -- Лайки
 INSERT INTO likes (film_id, user_id)
