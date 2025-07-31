@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.FriendService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.Collection;
@@ -15,21 +16,22 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final FriendService friendService;
 
     @GetMapping
     public Collection<User> findAllUsers() {
         return userService.findAllUsers();
     }
 
-    @GetMapping("/{friendId}/friends")
+    @GetMapping("/{userId}/friends")
     public Collection<User> getFriends(@PathVariable Long friendId) {
-        return userService.getFriends(friendId);
+        return friendService.getFriends(friendId);
     }
 
-    @GetMapping("/{friendId}/friends/common/{userId}")
+    @GetMapping("/{userId}/friends/common/{otherId}")
     public Collection<User> getCommonFriends(@PathVariable Long friendId,
                                              @PathVariable Long userId) {
-        return userService.getCommonFriends(friendId, userId);
+        return friendService.getCommonFriends(friendId, userId);
     }
 
     @GetMapping("/{id}")
@@ -50,19 +52,13 @@ public class UserController {
     @PutMapping("/{userId}/friends/{friendId}")
     public void addFriend(@PathVariable Long userId,
                           @PathVariable Long friendId) {
-        userService.addFriend(userId, friendId);
-    }
-
-    @PutMapping("/{userId}/friends/{friendId}/confirm")
-    public void confirmFriend(@PathVariable Long userId,
-                              @PathVariable Long friendId) {
-        userService.confirmFriendship(userId, friendId);
+        friendService.addFriend(userId, friendId);
     }
 
     @DeleteMapping("/{userId}/friends/{friendId}")
     public void removeFriend(@PathVariable Long userId,
                              @PathVariable Long friendId) {
-        userService.removeFriend(userId, friendId);
+        friendService.removeFriend(userId, friendId);
     }
 }
 

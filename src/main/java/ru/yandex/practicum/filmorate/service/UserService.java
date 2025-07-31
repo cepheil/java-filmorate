@@ -15,6 +15,7 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final ValidationService validationService;
 
     public Collection<User> findAllUsers() {
         log.debug("Попытка получения списка всех пользователей.");
@@ -45,7 +46,7 @@ public class UserService {
         if (newUser.getId() == null) {
             throw new ValidationException("ID пользователя не может быть null.");
         }
-        getUserById(newUser.getId());
+        validationService.validateUserExists(newUser.getId());
         if (newUser.getName() == null || newUser.getName().isBlank()) {
             newUser.setName(newUser.getLogin());
         }

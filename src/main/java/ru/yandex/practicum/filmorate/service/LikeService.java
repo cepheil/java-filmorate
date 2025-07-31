@@ -1,0 +1,19 @@
+package ru.yandex.practicum.filmorate.service;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.storage.like.LikeRepository;
+
+@Service
+@RequiredArgsConstructor
+public class LikeService {
+    LikeRepository likeRepository;
+
+    public void addLike(Long filmId, Long userId) {
+        likeRepository.addLike(filmId, userId);
+    }
+
+    public void removeLike(Long filmId, Long userId) {
+        likeRepository.removeLike(filmId, userId);
+    }
+}

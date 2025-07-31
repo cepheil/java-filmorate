@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-@Qualifier("userDbStorage")
+@Qualifier("userRepository")
 public class JdbcUserRepository extends BaseRepository<User> implements UserRepository {
     private static final String FIND_ALL_USERS_QUERY = "SELECT * FROM users ORDER BY user_id";
     private static final String FIND_USER_BY_ID_QUERY = "SELECT * FROM users WHERE user_id = ?";

@@ -1,7 +1,10 @@
 package ru.yandex.practicum.filmorate.model;
 
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import ru.yandex.practicum.filmorate.annotation.MinReleaseDate;
 
 import java.time.LocalDate;
@@ -9,6 +12,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
+@Builder(toBuilder = true)
+@RequiredArgsConstructor
+@AllArgsConstructor
 public class Film {
     private Long id;
     @NotBlank(message = "Название не может быть пустым")
@@ -21,9 +27,8 @@ public class Film {
     private LocalDate releaseDate;
     @Positive(message = "Продолжительность фильма должна быть положительным числом, в минутах")
     private int duration;
-    private Set<Long> likes = new HashSet<>();
-    @NotEmpty(message = "Фильм должен содержать хотя бы один жанр")
-    private Set<Genre> genres = new HashSet<>();
     @NotNull(message = "Рейтинг MPA не может быть пустой")
     private MpaRating mpa;
+    private Set<Long> likes = new HashSet<>();
+    private Set<Genre> genres = new HashSet<>();
 }

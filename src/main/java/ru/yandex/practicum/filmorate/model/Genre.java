@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class Genre {
-    private int id;
+    private Long id;
     @NotBlank(message = "Жанр не может быть пустым")
     private String name;
 }
