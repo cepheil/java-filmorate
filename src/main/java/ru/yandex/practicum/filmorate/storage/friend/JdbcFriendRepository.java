@@ -19,7 +19,7 @@ public class JdbcFriendRepository implements FriendRepository {
 
     private static final String ADD_FRIEND_QUERY = """
             INSERT INTO friends (user_id, friend_id, confirmed)
-            VALUES (?, ?, FALSE)
+            VALUES (?, ?, TRUE)
             """;
 
     private static final String CONFIRM_FRIENDSHIP_QUERY = """
@@ -31,14 +31,13 @@ public class JdbcFriendRepository implements FriendRepository {
     private static final String REMOVE_FRIEND_QUERY = """
             DELETE FROM friends
             WHERE (user_id = ? AND friend_id = ?)
-               OR (user_id = ? AND friend_id = ?)
             """;
 
     private static final String GET_FRIENDS_QUERY = """
             SELECT u.user_id, u.email, u.login, u.name, u.birthday
             FROM users u
             JOIN friends f ON u.user_id = f.friend_id
-            WHERE f.user_id = ? AND f.confirmed = TRUE
+            WHERE f.user_id = ?
             """;
 
     private static final String GET_COMMON_FRIENDS_QUERY = """
@@ -49,7 +48,6 @@ public class JdbcFriendRepository implements FriendRepository {
                 FROM friends f1
                 JOIN friends f2 ON f1.friend_id = f2.friend_id
                 WHERE f1.user_id = ? AND f2.user_id = ?
-                  AND f1.confirmed = TRUE AND f2.confirmed = TRUE)
             """;
 
     private static final String CHECK_FRIENDSHIP_QUERY = """

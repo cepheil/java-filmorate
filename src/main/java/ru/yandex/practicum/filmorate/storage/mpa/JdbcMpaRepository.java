@@ -1,4 +1,31 @@
 package ru.yandex.practicum.filmorate.storage.mpa;
 
-public class JdbcMpaRepository {
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.model.MpaRating;
+import ru.yandex.practicum.filmorate.storage.base.BaseRepository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public class JdbcMpaRepository extends BaseRepository<MpaRating> implements MpaRepository {
+
+    private static final String FIND_ALL_QUERY = "select * from mpa_ratings";
+    private static final String FIND_BY_ID_QUERY = "select * from mpa_ratings where mpa_rating_id = ?";
+
+    public JdbcMpaRepository(JdbcTemplate jdbc, RowMapper<MpaRating> mapper) {
+        super(jdbc, mapper);
+    }
+
+    @Override
+    public Optional<MpaRating> findMpaById(Long mpaId) {
+        return findOne(FIND_BY_ID_QUERY, mpaId);
+    }
+
+    @Override
+    public List<MpaRating> findAllMpa() {
+        return findMany(FIND_ALL_QUERY);
+    }
 }

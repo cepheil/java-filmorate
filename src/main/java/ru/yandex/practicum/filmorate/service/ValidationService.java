@@ -73,7 +73,7 @@ public class ValidationService {
         if (genreId == null) {
             throw new ValidationException("ID жанра не может быть null");
         }
-        genreRepository.findById(genreId)
+        genreRepository.findGenreById(genreId)
                 .orElseThrow(() -> new NotFoundException("Жанр с ID " + genreId + " не найден"));
     }
 
@@ -81,7 +81,7 @@ public class ValidationService {
         if (mpaId == null) {
             throw new ValidationException("ID рейтинга не может быть null");
         }
-        mpaRepository.findById(mpaId)
+        mpaRepository.findMpaById(mpaId)
                 .orElseThrow(() -> new NotFoundException("Рейтинг MPA с ID " + mpaId + " не найден"));
     }
 }

@@ -1,30 +1,31 @@
 package ru.yandex.practicum.filmorate.service;
 
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dal.GenreRepository;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.storage.genre.GenreRepository;
 
-import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class GenreService {
-    private final GenreRepository jdbcGenreRepository;
+    private final GenreRepository genreRepository;
 
-    public Collection<Genre> findAllGenres() {
-        log.info("GET /genres - получение списка всех жанров");
-        return jdbcGenreRepository.findAll();
+    public Genre findGenreById(Long genreId) {
+        return genreRepository.findGenreById(genreId)
+                .orElseThrow(() -> new NotFoundException("Жанр с ID: " + genreId + " не найден."));
     }
 
-    public Genre findGenreById(Long id) {
-        log.info("GET /genres/{id} - получение жанра с идентификатором id");
-        return jdbcGenreRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Жанр с ID=" + id + " не найден"));
+    public List<Genre> findAllGenres() {
+        return genreRepository.findAllGenres();
     }
 
+    public Set<Genre> findGenreByFilmId(Long filmId) {
+        return genreRepository.findGenreByFilmId(filmId);
+    }
 }
