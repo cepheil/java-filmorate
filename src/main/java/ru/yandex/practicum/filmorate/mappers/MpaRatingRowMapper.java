@@ -13,8 +13,8 @@ public class MpaRatingRowMapper implements RowMapper<MpaRating> {
     public MpaRating mapRow(ResultSet resultSet, int rowNum) throws SQLException {
         return new MpaRating().toBuilder()
                 .id(resultSet.getLong("mpa_id"))
-                .name(resultSet.getString("mpa_name"))
-                .description(resultSet.getString("mpa_description"))
+                .name(resultSet.getString("name"))
+                .description(resultSet.getString("description"))
                 .build();
     }
 }

@@ -16,11 +16,10 @@ public class JdbcGenreRepository extends BaseRepository<Genre> implements GenreR
     private static final String FIND_ALL_GENRES_QUERY = "SELECT * FROM genres";
     private static final String FIND_GENRE_BY_ID_QUERY = "SELECT * FROM genres WHERE genre_id = ?";
     private static final String FIND_FILM_GENRES_BY_ID_QUERY = """
-            SELECT g.genre_id, g.genre_name
-            FROM films f
-            JOIN film_genre fg ON f.film_id = fg.film_id
+            SELECT g.genre_id, g.name
+            FROM film_genre fg
             JOIN genres g ON fg.genre_id = g.genre_id
-            WHERE f.film_id = ?
+            WHERE fg.film_id = ?
             """;
 
     public JdbcGenreRepository(JdbcTemplate jdbc, RowMapper<Genre> mapper) {

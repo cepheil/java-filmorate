@@ -35,9 +35,7 @@ public class FriendService {
 
     public Collection<User> getFriends(Long userId) {
         log.debug("Попытка получения списка друзей для пользователя {}", userId);
-        if (userId == null) {
-            throw new ValidationException("ID пользователя не может быть null");
-        }
+        validationService.validateUserExists(userId);
         return friendRepository.getFriends(userId);
     }
 

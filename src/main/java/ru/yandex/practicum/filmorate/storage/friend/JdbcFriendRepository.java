@@ -48,6 +48,7 @@ public class JdbcFriendRepository implements FriendRepository {
                 FROM friends f1
                 JOIN friends f2 ON f1.friend_id = f2.friend_id
                 WHERE f1.user_id = ? AND f2.user_id = ?
+               )
             """;
 
     private static final String CHECK_FRIENDSHIP_QUERY = """
@@ -76,7 +77,7 @@ public class JdbcFriendRepository implements FriendRepository {
 
     @Override
     public void removeFriend(Long userId, Long friendId) {
-        jdbc.update(REMOVE_FRIEND_QUERY, userId, friendId, friendId, userId);
+        jdbc.update(REMOVE_FRIEND_QUERY, userId, friendId);
     }
 
     @Override
