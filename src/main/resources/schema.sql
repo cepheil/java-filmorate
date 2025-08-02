@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS films (
     description VARCHAR(255),
     release_date DATE,
     duration INTEGER,
-    mpa_id INTEGER REFERENCES mpa_ratings (mpa_id)
+    mpa_id BIGINT REFERENCES mpa_ratings (mpa_id)
 );
 
 -- 3. В конце - таблицы связей (многие-ко-многим)
