@@ -2,25 +2,22 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.storage.base.BaseRepository;
+import ru.yandex.practicum.filmorate.storage.base.BaseNamedParameterRepository;
 import ru.yandex.practicum.filmorate.storage.genre.GenreRepository;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
 @Qualifier("filmRepository")
-public class JdbcFilmRepository extends BaseRepository<Film> implements FilmRepository {
+public class JdbcFilmRepository extends BaseNamedParameterRepository<Film> implements FilmRepository {
     private static final String FIND_ALL_FILMS_QUERY = """
             SELECT f.*, m.mpa_id AS mpa_id, m.name AS mpa_name, m.description AS mpa_description
             FROM films f
@@ -32,21 +29,21 @@ public class JdbcFilmRepository extends BaseRepository<Film> implements FilmRepo
             SELECT f.*, m.mpa_id AS mpa_id, m.name AS mpa_name, m.description AS mpa_description
             FROM films f
             JOIN mpa_ratings m ON f.mpa_id = m.mpa_id
-            WHERE f.film_id = ?
+            WHERE f.film_id = :filmId
             """;
 
     private static final String INSERT_FILM_QUERY = """
             INSERT INTO films (name, description, release_date, duration, mpa_id)
-            VALUES (?, ?, ?, ?, ?)
+            VALUES (:name, :description, :releaseDate, :duration, :mpaId)
             """;
 
     private static final String UPDATE_FILM_QUERY = """
             UPDATE films
-            SET name = ?, description = ?, release_date = ?, duration = ?, mpa_id = ?
-            WHERE film_id = ?
+            SET name = :name, description = :description, release_date = :releaseDate, duration = :duration, mpa_id = :mpaId
+            WHERE film_id = :filmId
             """;
 
-    private static final String DELETE_FILM_QUERY = "DELETE FROM films WHERE film_id = ?";
+    private static final String DELETE_FILM_QUERY = "DELETE FROM films WHERE film_id = :filmId";
 
     private static final String GET_POPULAR_FILM_QUERY = """
             SELECT f.*, m.mpa_id AS mpa_id, m.name AS mpa_name, m.description AS mpa_description,
@@ -57,29 +54,32 @@ public class JdbcFilmRepository extends BaseRepository<Film> implements FilmRepo
             GROUP BY f.film_id, f.name, f.description, f.release_date, f.duration, f.mpa_id, 
                  m.mpa_id, m.name, m.description
             ORDER BY like_count DESC
-            LIMIT ?
+            LIMIT :count
             """;
 
-    private static final String DELETE_GENRE_FILM_QUERY = "DELETE FROM film_genre WHERE film_id = ?";
-    private static final String INSERT_GENRE_FILM_QUERY = "INSERT INTO film_genre(film_id, genre_id) VALUES(?, ?)";
+    private static final String DELETE_GENRE_FILM_QUERY = "DELETE FROM film_genre WHERE film_id = :filmId";
+    private static final String INSERT_GENRE_FILM_QUERY = """
+            INSERT INTO film_genre(film_id, genre_id) VALUES(?, ?)""";
 
     private final GenreRepository genreRepository;
 
-    public JdbcFilmRepository(JdbcTemplate jdbc, RowMapper<Film> mapper, GenreRepository genreRepository) {
+    public JdbcFilmRepository(NamedParameterJdbcOperations jdbc, RowMapper<Film> mapper, GenreRepository genreRepository) {
         super(jdbc, mapper);
         this.genreRepository = genreRepository;
     }
 
     @Override
     public List<Film> findAllFilms() {
-        return findMany(FIND_ALL_FILMS_QUERY).stream().peek(film -> {
+        return findMany(FIND_ALL_FILMS_QUERY, new HashMap<>()).stream().peek(film -> {
             film.setGenres(genreRepository.findGenreByFilmId(film.getId()));
         }).collect(Collectors.toList());
     }
 
     @Override
     public Optional<Film> getFilmById(Long filmId) {
-        return findOne(FIND_FILM_BY_ID_QUERY, filmId).map(film -> {
+        Map<String, Object> params = new HashMap<>();
+        params.put("filmId", filmId);
+        return findOne(FIND_FILM_BY_ID_QUERY, params).map(film -> {
             film.setGenres(genreRepository.findGenreByFilmId(filmId));
             return film;
         });
@@ -87,14 +87,14 @@ public class JdbcFilmRepository extends BaseRepository<Film> implements FilmRepo
 
     @Override
     public Film createFilm(Film film) {
-        long id = insert(
-                INSERT_FILM_QUERY,
-                film.getName(),
-                film.getDescription(),
-                film.getReleaseDate(),
-                film.getDuration(),
-                film.getMpa().getId()
-        );
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", film.getName());
+        params.put("description", film.getDescription());
+        params.put("releaseDate", film.getReleaseDate());
+        params.put("duration", film.getDuration());
+        params.put("mpaId", film.getMpa().getId());
+
+        long id = insert(INSERT_FILM_QUERY, params);
         film.setId(id);
         updateGenres(film.getGenres(), film.getId());
         return film;
@@ -102,44 +102,57 @@ public class JdbcFilmRepository extends BaseRepository<Film> implements FilmRepo
 
     @Override
     public Film updateFilm(Film newFilm) {
-        update(
-                UPDATE_FILM_QUERY,
-                newFilm.getName(),
-                newFilm.getDescription(),
-                newFilm.getReleaseDate(),
-                newFilm.getDuration(),
-                newFilm.getMpa().getId(),
-                newFilm.getId()
-        );
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", newFilm.getName());
+        params.put("description", newFilm.getDescription());
+        params.put("releaseDate", newFilm.getReleaseDate());
+        params.put("duration", newFilm.getDuration());
+        params.put("mpaId", newFilm.getMpa().getId());
+        params.put("filmId", newFilm.getId());
+
+        update(UPDATE_FILM_QUERY, params);
         updateGenres(newFilm.getGenres(), newFilm.getId());
         return newFilm;
     }
 
     @Override
     public boolean deleteFilm(Long filmId) {
-        return delete(DELETE_FILM_QUERY, filmId);
+        Map<String, Object> params = new HashMap<>();
+        params.put("filmId", filmId);
+        return delete(DELETE_FILM_QUERY, params);
     }
 
     @Override
     public Collection<Film> getPopularFilms(int count) {
-        return findMany(GET_POPULAR_FILM_QUERY, count);
+        Map<String, Object> params = new HashMap<>();
+        params.put("count", count);
+        return findMany(GET_POPULAR_FILM_QUERY, params);
     }
 
     public void updateGenres(Set<Genre> genres, Long filmId) {
         if (!genres.isEmpty()) {
-            List<Genre> genresList = genres.stream().toList();
-            jdbc.batchUpdate(INSERT_GENRE_FILM_QUERY, new BatchPreparedStatementSetter() {
-                @Override
-                public void setValues(PreparedStatement ps, int i) throws SQLException {
-                    ps.setLong(1, filmId);
-                    ps.setInt(2, Math.toIntExact(genresList.get(i).getId()));
-                }
+            Map<String, Object> baseParams = new HashMap<>();
+            baseParams.put("filmId", filmId);
 
-                @Override
-                public int getBatchSize() {
-                    return genresList.size();
-                }
-            });
+            jdbc.update(DELETE_GENRE_FILM_QUERY, baseParams);
+
+            List<Genre> genreList = new ArrayList<>(genres);
+
+            jdbc.getJdbcOperations().batchUpdate(
+                    INSERT_GENRE_FILM_QUERY,
+                    new BatchPreparedStatementSetter() {
+                        @Override
+                        public void setValues(PreparedStatement ps, int i) throws SQLException {
+                            ps.setLong(1, filmId);
+                            ps.setInt(2, Math.toIntExact(genreList.get(i).getId()));
+                        }
+
+                        @Override
+                        public int getBatchSize() {
+                            return genreList.size();
+                        }
+                    }
+            );
         }
     }
 }
