@@ -51,7 +51,7 @@ public class JdbcFilmRepository extends BaseNamedParameterRepository<Film> imple
             FROM films f
             JOIN mpa_ratings m ON f.mpa_id = m.mpa_id
             LEFT JOIN likes l ON f.film_id = l.film_id
-            GROUP BY f.film_id, f.name, f.description, f.release_date, f.duration, f.mpa_id, 
+            GROUP BY f.film_id, f.name, f.description, f.release_date, f.duration, f.mpa_id,
                  m.mpa_id, m.name, m.description
             ORDER BY like_count DESC
             LIMIT :count
