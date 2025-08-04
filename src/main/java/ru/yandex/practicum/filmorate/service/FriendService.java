@@ -17,7 +17,7 @@ public class FriendService {
     private final ValidationService validationService;
 
     public void addFriend(Long userId, Long friendId) {
-        log.debug("Попытка добавления друзья: пользователь {} добавляет {}", userId, friendId);
+        log.info("Попытка добавления друзья: пользователь {} добавляет {}", userId, friendId);
         validationService.validateUsersExist(userId, friendId);
         if (userId.equals(friendId)) {
             throw new ValidationException("Пользователь не может добавить себя в друзья.");
@@ -27,20 +27,20 @@ public class FriendService {
     }
 
     public void removeFriend(Long userId, Long friendId) {
-        log.debug("Пользователь {} удалил пользователя {} из друзей", userId, friendId);
+        log.info("Пользователь {} удалил пользователя {} из друзей", userId, friendId);
         validationService.validateUsersExist(userId, friendId);
         friendRepository.removeFriend(userId, friendId);
         log.info("Пользователь {} удалил пользователя {} из друзей", userId, friendId);
     }
 
     public Collection<User> getFriends(Long userId) {
-        log.debug("Попытка получения списка друзей для пользователя {}", userId);
+        log.info("Попытка получения списка друзей для пользователя {}", userId);
         validationService.validateUserExists(userId);
         return friendRepository.getFriends(userId);
     }
 
     public Collection<User> getCommonFriends(Long userId1, Long userId2) {
-        log.debug("Получение общих друзей пользователей {} и {}", userId1, userId2);
+        log.info("Получение общих друзей пользователей {} и {}", userId1, userId2);
         validationService.validateUsersExist(userId1, userId2);
         return friendRepository.getCommonFriends(userId1, userId2);
     }

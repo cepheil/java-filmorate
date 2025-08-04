@@ -20,19 +20,19 @@ public class FilmService {
     private final LikeRepository likeRepository;
 
     public Collection<Film> findAllFilms() {
-        log.debug("Попытка получения всех фильмов");
+        log.info("Попытка получения всех фильмов");
         return filmRepository.findAllFilms();
     }
 
     public Film getFilmById(Long filmId) {
-        log.debug("Попытка получения фильма по ID: {}", filmId);
+        log.info("Попытка получения фильма по ID: {}", filmId);
         validationService.validateFilmExists(filmId);
         return filmRepository.getFilmById(filmId)
                 .orElseThrow(() -> new NotFoundException("Фильм с ID " + filmId + " не найден"));
     }
 
     public Film createFilm(Film film) {
-        log.debug("Попытка создания фильма: {}", film.getName());
+        log.info("Попытка создания фильма: {}", film.getName());
         validationService.validateFilm(film);
         Film createdFilm = filmRepository.createFilm(film);
         log.info("Создан фильм с ID: {}", createdFilm.getId());
@@ -40,7 +40,7 @@ public class FilmService {
     }
 
     public Film updateFilm(Film newFilm) {
-        log.debug("Попытка обновления фильма с ID: {}", newFilm.getId());
+        log.info("Попытка обновления фильма с ID: {}", newFilm.getId());
         validationService.validateFilm(newFilm);
         Film updatedFilm = filmRepository.updateFilm(newFilm);
         log.info("Фильм с ID {} обновлен", newFilm.getId());
@@ -48,7 +48,7 @@ public class FilmService {
     }
 
     public Collection<Film> getPopularFilms(int count) {
-        log.debug("Попытка получения популярных фильмов в количестве {} штук", count);
+        log.info("Попытка получения популярных фильмов в количестве {} штук", count);
         if (count <= 0) {
             throw new ValidationException("Количество фильмов должно быть положительным числом.");
         }
@@ -56,7 +56,7 @@ public class FilmService {
     }
 
     public void addLike(Long filmId, Long userId) {
-        log.debug("Попытка добавления лайка фильму {} от пользователя {}", filmId, userId);
+        log.info("Попытка добавления лайка фильму {} от пользователя {}", filmId, userId);
         validationService.validateFilmAndUserIds(filmId, userId);
         validationService.validateFilmExists(filmId);
         validationService.validateUserExists(userId);
@@ -65,7 +65,7 @@ public class FilmService {
     }
 
     public void removeLike(Long filmId, Long userId) {
-        log.debug("Попытка удаления лайка у фильма {} от пользователя {}", filmId, userId);
+        log.info("Попытка удаления лайка у фильма {} от пользователя {}", filmId, userId);
         validationService.validateFilmAndUserIds(filmId, userId);
         likeRepository.removeLike(filmId, userId);
         log.info("Пользователь {} убрал лайк у фильма {}", userId, filmId);

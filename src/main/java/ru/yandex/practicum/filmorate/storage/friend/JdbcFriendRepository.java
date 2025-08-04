@@ -53,38 +53,27 @@ public class JdbcFriendRepository implements FriendRepository {
                )
             """;
 
-    private static final String CHECK_FRIENDSHIP_QUERY = """
+    private static final String CHECK_FRIENDSHIP_STATUS_QUERY = """
             SELECT COUNT(*) > 0 AS has_friendship
             FROM friends
-            WHERE user_id = :userId AND friend_id = :friendId AND confirmed = TRUE
-            """;
-
-    private static final String CHECK_FRIEND_REQUEST_QUERY = """
-            SELECT COUNT(*) > 0 AS has_request
-            FROM friends
-            WHERE user_id = :userId AND friend_id = :friendId AND confirmed = FALSE
+            WHERE user_id = :userId AND friend_id = :friendId AND confirmed = :confirmed
             """;
 
     @Override
     public void addFriend(Long userId, Long friendId) {
-        Map<String, Object> checkParams = new HashMap<>();
-        checkParams.put("userId", friendId);
-        checkParams.put("friendId", userId);
+        boolean hasReverseRequest = checkFriendshipStatus(userId, friendId, false);
 
-        Boolean hasReverseRequest = jdbc.queryForObject(
-                CHECK_FRIEND_REQUEST_QUERY, checkParams, Boolean.class);
+        if (hasReverseRequest) {
+        Map<String, Object> confirmParams1 = new HashMap<>();
+        confirmParams1.put("userId", userId);
+        confirmParams1.put("friendId", friendId);
 
-        if (hasReverseRequest != null && hasReverseRequest) {
-            Map<String, Object> confirmParams1 = new HashMap<>();
-            confirmParams1.put("userId", userId);
-            confirmParams1.put("friendId", friendId);
+        Map<String, Object> confirmParams2 = new HashMap<>();
+        confirmParams2.put("userId", friendId);
+        confirmParams2.put("friendId", userId);
 
-            Map<String, Object> confirmParams2 = new HashMap<>();
-            confirmParams2.put("userId", friendId);
-            confirmParams2.put("friendId", userId);
-
-            jdbc.update(CONFIRM_FRIENDSHIP_QUERY, confirmParams1);
-            jdbc.update(CONFIRM_FRIENDSHIP_QUERY, confirmParams2);
+        jdbc.update(CONFIRM_FRIENDSHIP_QUERY, confirmParams1);
+        jdbc.update(CONFIRM_FRIENDSHIP_QUERY, confirmParams2);
         } else {
             Map<String, Object> addParams = new HashMap<>();
             addParams.put("userId", userId);
@@ -118,10 +107,15 @@ public class JdbcFriendRepository implements FriendRepository {
 
     @Override
     public boolean hasFriendship(Long userId, Long friendId) {
+        return checkFriendshipStatus(userId, friendId, true);
+    }
+
+    private boolean checkFriendshipStatus(Long userId, Long friendId, boolean confirmed) {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
         params.put("friendId", friendId);
-        Boolean result = jdbc.queryForObject(CHECK_FRIENDSHIP_QUERY, params, Boolean.class);
+        params.put("confirmed", confirmed);
+        Boolean result = jdbc.queryForObject(CHECK_FRIENDSHIP_STATUS_QUERY, params, Boolean.class);
         return result != null ? result : false;
     }
 }

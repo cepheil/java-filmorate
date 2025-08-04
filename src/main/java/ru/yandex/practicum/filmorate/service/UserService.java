@@ -18,12 +18,12 @@ public class UserService {
     private final ValidationService validationService;
 
     public Collection<User> findAllUsers() {
-        log.debug("Попытка получения списка всех пользователей.");
+        log.info("Попытка получения списка всех пользователей.");
         return userRepository.findAllUsers();
     }
 
     public User getUserById(Long userId) {
-        log.debug("Попытка получения пользователя по ID: {}", userId);
+        log.info("Попытка получения пользователя по ID: {}", userId);
         if (userId == null) {
             throw new ValidationException("ID пользователя не может быть null.");
         }
@@ -32,7 +32,7 @@ public class UserService {
     }
 
     public User createUser(User user) {
-        log.debug("Попытка создания нового пользователя: email={}, login={}", user.getEmail(), user.getLogin());
+        log.info("Попытка создания нового пользователя: email={}, login={}", user.getEmail(), user.getLogin());
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
@@ -42,7 +42,7 @@ public class UserService {
     }
 
     public User updateUser(User newUser) {
-        log.debug("Попытка обновления пользователя с ID: {}", newUser.getId());
+        log.info("Попытка обновления пользователя с ID: {}", newUser.getId());
         if (newUser.getId() == null) {
             throw new ValidationException("ID пользователя не может быть null.");
         }

@@ -7,7 +7,7 @@ import ru.yandex.practicum.filmorate.storage.like.LikeRepository;
 @Service
 @RequiredArgsConstructor
 public class LikeService {
-    LikeRepository likeRepository;
+    private final LikeRepository likeRepository;
 
     public void addLike(Long filmId, Long userId) {
         likeRepository.addLike(filmId, userId);

@@ -20,13 +20,13 @@ public class GenreController {
 
     @GetMapping
     public Collection<Genre> getAllGenres() {
-        log.debug("Попытка получения всех жанров");
+        log.info("Попытка получения всех жанров");
         return genreService.findAllGenres();
     }
 
     @GetMapping("/{id}")
     public Genre getGenreById(@PathVariable Long id) {
-        log.debug("Попытка получения жанра по ID: {}", id);
+        log.info("Попытка получения жанра по ID: {}", id);
         return genreService.findGenreById(id);
     }
 }
