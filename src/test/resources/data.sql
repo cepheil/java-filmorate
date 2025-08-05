@@ -1,41 +1,43 @@
--- Предустановленные рейтинги MPA
-MERGE INTO ratings_mpa (mpa_id, name) KEY(mpa_id) VALUES (1, 'G');
-MERGE INTO ratings_mpa (mpa_id, name) KEY(mpa_id) VALUES (2, 'PG');
-MERGE INTO ratings_mpa (mpa_id, name) KEY(mpa_id) VALUES (3, 'PG-13');
-MERGE INTO ratings_mpa (mpa_id, name) KEY(mpa_id) VALUES (4, 'R');
-MERGE INTO ratings_mpa (mpa_id, name) KEY(mpa_id) VALUES (5, 'NC-17');
+-- Тестовые данные для MPA рейтингов
+INSERT INTO mpa_ratings (mpa_id, name, description) VALUES
+(1, 'G', 'General Audiences'),
+(2, 'PG', 'Parental Guidance Suggested'),
+(3, 'PG-13', 'Parents Strongly Cautioned'),
+(4, 'R', 'Restricted'),
+(5, 'NC-17', 'Adults Only');
 
--- Предустановленные жанры
-MERGE INTO genres (genre_id, name) KEY(genre_id) VALUES (1, 'Комедия');
-MERGE INTO genres (genre_id, name) KEY(genre_id) VALUES (2, 'Драма');
-MERGE INTO genres (genre_id, name) KEY(genre_id) VALUES (3, 'Мультфильм');
-MERGE INTO genres (genre_id, name) KEY(genre_id) VALUES (4, 'Триллер');
-MERGE INTO genres (genre_id, name) KEY(genre_id) VALUES (5, 'Документальный');
-MERGE INTO genres (genre_id, name) KEY(genre_id) VALUES (6, 'Боевик');
+-- Тестовые данные для жанров
+INSERT INTO genres (genre_id, name) VALUES
+(1, 'Комедия'),
+(2, 'Драма'),
+(3, 'Мультфильм'),
+(4, 'Триллер'),
+(5, 'Документальный'),
+(6, 'Боевик');
 
 -- Тестовые данные для пользователей
-MERGE INTO users (id, email, login, name, birthday) KEY(id) VALUES (1, 'aaa@example.com', 'aaa', 'aaa aaa', '1985-04-15');
-MERGE INTO users (id, email, login, name, birthday) KEY(id) VALUES (2, 'bbb@example.com', 'bbb', 'bbb bbb', '1988-07-22');
-MERGE INTO users (id, email, login, name, birthday) KEY(id) VALUES (3, 'ccc@example.com', 'ccc', 'ccc ccc', '1992-11-03');
+INSERT INTO users (user_id, email, login, name, birthday) VALUES
+(1, 'user1@example.com', 'user1', 'User One', '1990-01-01'),
+(2, 'user2@example.com', 'user2', 'User Two', '1990-05-05'),
+(3, 'user3@example.com', 'user3', 'User Three', '1990-03-03');
 
 -- Тестовые данные для фильмов
-MERGE INTO films (id, name, description, release_date, duration, mpa_id) KEY(id) VALUES (1, 'film1', 'description film1', '2019-06-10', 130, 2);
-MERGE INTO films (id, name, description, release_date, duration, mpa_id) KEY(id) VALUES (2, 'film2', 'description film2', '2021-11-20', 110, 4);
+INSERT INTO films (film_id, name, description, release_date, duration, mpa_id) VALUES
+(1, 'Test Film 1', 'Test Description 1', '2020-01-01', 120, 1),
+(2, 'Test Film 2', 'Test Description 2', '2021-01-01', 150, 2);
 
 -- Тестовые данные для дружбы
-MERGE INTO friendships (user_id, friend_id, confirmed) KEY(user_id, friend_id) VALUES (1, 3, TRUE);
-MERGE INTO friendships (user_id, friend_id, confirmed) KEY(user_id, friend_id) VALUES (2, 3, TRUE);
+INSERT INTO friends (user_id, friend_id, confirmed) VALUES
+(1, 3, TRUE),
+(2, 3, TRUE);
 
 -- Тестовые данные для лайков
-MERGE INTO likes (film_id, user_id) KEY(film_id, user_id) VALUES (1, 1);
-MERGE INTO likes (film_id, user_id) KEY(film_id, user_id) VALUES (1, 2);
+INSERT INTO likes (film_id, user_id) VALUES
+(1, 1),
+(1, 2);
 
 -- Тестовые данные для жанров фильмов
-MERGE INTO film_genre (film_id, genre_id) KEY(film_id, genre_id) VALUES (1, 1);
-MERGE INTO film_genre (film_id, genre_id) KEY(film_id, genre_id) VALUES (1, 2);
-MERGE INTO film_genre (film_id, genre_id) KEY(film_id, genre_id) VALUES (2, 3);
-
-
--- Сброс sequence для таблиц
-ALTER TABLE users ALTER COLUMN id RESTART WITH 4;
-ALTER TABLE films ALTER COLUMN id RESTART WITH 3;
+INSERT INTO film_genre (film_id, genre_id) VALUES
+(1, 1),
+(1, 2),
+(2, 3);
