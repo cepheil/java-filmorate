@@ -11,7 +11,7 @@ import java.util.Map;
 @Data
 public class User {
     private Long id;
-    private Map<Long, FriendshipStatus> friends = new HashMap<>();
+    //private Map<Long, FriendshipStatus> friends = new HashMap<>();
 
     @NotBlank(message = "Email не может быть пустым")
     @Email(message = "Некорректный формат email")

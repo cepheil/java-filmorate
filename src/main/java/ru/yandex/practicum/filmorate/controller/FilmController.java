@@ -18,18 +18,6 @@ public class FilmController {
     private final FilmService filmService;
 
 
-    @GetMapping
-    public Collection<Film> getAllFilms() {
-        return filmService.getAllFilms();
-    }
-
-
-    //GET .../films/{id}
-    @GetMapping("/{filmId}")
-    public Film getFilmById(@PathVariable @Positive Long filmId) {
-        return filmService.getFilmById(filmId);
-    }
-
 
     @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) {
@@ -43,6 +31,26 @@ public class FilmController {
     }
 
 
+    @GetMapping
+    public Collection<Film> getAllFilms() {
+        return filmService.getAllFilms();
+    }
+
+
+    //GET .../films/{id}
+    @GetMapping("/{filmId}")
+    public Film getFilmById(@PathVariable @Positive Long filmId) {
+        return filmService.getFilmById(filmId);
+    }
+
+
+    //DELETE /films/{filmId}
+    @DeleteMapping("/{filmId}")
+    public void deleteFilm(@PathVariable @Positive Long id) {
+        filmService.deleteFilm(id);
+    }
+
+
     //GET /films/popular?count={count}
     @GetMapping("/popular")
     public Collection<Film> getPopularFilms(@RequestParam(defaultValue = "10") @Positive int count) {
@@ -50,19 +58,21 @@ public class FilmController {
     }
 
 
+
     //PUT /films/{id}/like/{userId}
     @PutMapping("/{filmId}/like/{userId}")
     public void addLike(@PathVariable @Positive Long filmId,
                         @PathVariable @Positive Long userId) {
         filmService.addLike(filmId, userId);
-
     }
 
 
+    //DELETE /films/{id}/like/{userId}
     @DeleteMapping("/{filmId}/like/{userId}")
     public void removeLike(@PathVariable @Positive Long filmId,
                            @PathVariable @Positive Long userId) {
         filmService.removeLike(filmId, userId);
     }
+
 
 }

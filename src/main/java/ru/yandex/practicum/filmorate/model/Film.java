@@ -15,9 +15,10 @@ public class Film {
     private Long id;
 
     @NotBlank(message = "Name не может быть пустым")
+    @Size(max=200)
     private String name;
 
-    @Size(max = 200, message = "Описание не должно превышать 200 символов")
+    @Size(max = 500, message = "Описание не должно превышать 200 символов")
     private String description;
 
     @NotNull(message = "Дата релиза должна быть указана")
@@ -27,7 +28,7 @@ public class Film {
     @Positive(message = "Продолжительность должна быть положительной")
     private Long duration;
 
-    @NotEmpty(message = "Фильм должен относиться хотя бы к одному жанру")
+    //@NotEmpty(message = "Фильм должен относиться хотя бы к одному жанру")
     private List<Genre> genres = new ArrayList<>();
 
     @NotNull(message = "фильм должен иметь рейтинг")

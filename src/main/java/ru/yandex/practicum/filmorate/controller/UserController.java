@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 
 
+import ru.yandex.practicum.filmorate.service.FriendshipService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.Collection;
@@ -18,6 +19,18 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final FriendshipService friendshipService;
+
+
+    @PostMapping
+    public User createUser(@Valid @RequestBody User user) {
+        return userService.createUser(user);
+    }
+
+    @PutMapping
+    public User updateUser(@Valid @RequestBody User newUser) {
+        return userService.updateUser(newUser);
+    }
 
 
     @GetMapping
@@ -32,35 +45,30 @@ public class UserController {
     }
 
 
-    @PostMapping
-    public User createUser(@Valid @RequestBody User user) {
-        return userService.createUser(user);
+    @DeleteMapping("/{userId}")
+    public void deleteUser(@PathVariable @Positive Long id) {
+        userService.deleteUser(id);
     }
 
-
-    @PutMapping
-    public User updateUser(@Valid @RequestBody User newUser) {
-        return userService.updateUser(newUser);
-    }
 
     /*
-    PUT /users/{userId}/friends/{friendId}
-    userId - кто отправляет запрос
-    friendId - кому отправляют запрос
-    */
+PUT /users/{userId}/friends/{friendId}
+userId - кто отправляет запрос
+friendId - кому отправляют запрос
+*/
     @PutMapping("/{userId}/friends/{friendId}")
     public void addFriend(@PathVariable @Positive Long userId,
                           @PathVariable @Positive Long friendId) {
-        userService.addFriend(userId, friendId);
+        friendshipService.addFriend(userId, friendId);
     }
 
 
-    @PutMapping("/users/{userId}/friends/{friendId}/confirm")
+    @PutMapping("/{userId}/friends/{friendId}/confirm")
     public void confirmFriendship(
             @PathVariable Long userId,
             @PathVariable Long friendId
     ) {
-        userService.confirmFriend(userId, friendId);
+        friendshipService.confirmFriend(userId, friendId);
     }
 
 
@@ -68,14 +76,14 @@ public class UserController {
     @DeleteMapping("/{userId}/friends/{friendId}")
     public void removeFriend(@PathVariable @Positive Long userId,
                              @PathVariable @Positive Long friendId) {
-        userService.removeFriend(userId, friendId);
+        friendshipService.removeFriend(userId, friendId);
     }
 
 
     //GET /users/{id}/friends
     @GetMapping("/{userId}/friends")
     public Collection<User> getFriendsById(@PathVariable @Positive Long userId) {
-        return userService.getFriendsById(userId);
+        return friendshipService.getFriendsById(userId);
     }
 
 
@@ -83,8 +91,7 @@ public class UserController {
     @GetMapping("/{userId}/friends/common/{otherId}")
     public Collection<User> getCommonFriends(@PathVariable @Positive Long userId,
                                              @PathVariable @Positive Long otherId) {
-        return userService.getCommonFriends(userId, otherId);
-
+        return friendshipService.getCommonFriends(userId, otherId);
     }
 
 
