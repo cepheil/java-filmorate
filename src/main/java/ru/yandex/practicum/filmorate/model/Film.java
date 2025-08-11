@@ -4,9 +4,7 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Data
@@ -15,10 +13,10 @@ public class Film {
     private Long id;
 
     @NotBlank(message = "Name не может быть пустым")
-    @Size(max=200)
+    @Size(max = 200)
     private String name;
 
-    @Size(max = 500, message = "Описание не должно превышать 200 символов")
+    @Size(max = 200, message = "Описание не должно превышать 200 символов")
     private String description;
 
     @NotNull(message = "Дата релиза должна быть указана")
@@ -29,8 +27,8 @@ public class Film {
     private Long duration;
 
     //@NotEmpty(message = "Фильм должен относиться хотя бы к одному жанру")
-    private List<Genre> genres = new ArrayList<>();
+    private Set<Genre> genres = new HashSet<>();
 
     @NotNull(message = "фильм должен иметь рейтинг")
-    private RatingMpa rating;
+    private RatingMpa mpa;
 }

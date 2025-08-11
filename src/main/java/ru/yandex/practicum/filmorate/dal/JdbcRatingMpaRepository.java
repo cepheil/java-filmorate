@@ -13,8 +13,8 @@ import java.util.Optional;
 @Repository
 @Qualifier("jdbc")
 public class JdbcRatingMpaRepository extends BaseRepository<RatingMpa> implements RatingMpaRepository {
-    private static final String FIND_ALL_QUERY = "SELECT * FROM ratings_mpa";
-    private static final String FIND_BY_ID_QUERY = "SELECT * FROM ratings_mpa WHERE mpa_id = ?";
+    private static final String FIND_ALL_QUERY = "SELECT * FROM ratings_mpa ORDER BY mpa_id";
+    private static final String FIND_BY_ID_QUERY = "SELECT * FROM ratings_mpa WHERE mpa_id = ? ORDER BY mpa_id";
 
 
     public JdbcRatingMpaRepository(JdbcTemplate jdbc, RatingMpaRowMapper mapper) {

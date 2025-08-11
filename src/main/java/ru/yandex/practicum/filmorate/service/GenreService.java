@@ -19,7 +19,7 @@ public class GenreService {
 
     public Collection<Genre> findAllGenres() {
         log.info("GET /genres - получение списка всех жанров");
-        return  jdbcGenreRepository.findAll();
+        return jdbcGenreRepository.findAll();
     }
 
     public Genre findGenreById(Long id) {
@@ -28,6 +28,5 @@ public class GenreService {
         return jdbcGenreRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Жанр с ID=" + id + " не найден"));
     }
-
 
 }

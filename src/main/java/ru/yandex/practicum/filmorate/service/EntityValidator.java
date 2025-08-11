@@ -13,6 +13,7 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
 
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -84,7 +85,7 @@ public class EntityValidator {
             }
         }
         if (user.getLogin() != null && !user.getLogin().isBlank()) {
-            boolean loginExists = userRepository.isDuplicateLogin(user.getId(),user.getLogin());
+            boolean loginExists = userRepository.isDuplicateLogin(user.getId(), user.getLogin());
             if (loginExists) {
                 log.error("Этот логин уже используется: {}", user.getLogin());
                 throw new DuplicatedDataException("Этот логин уже используется: " + user.getLogin());
@@ -116,21 +117,18 @@ public class EntityValidator {
             log.error("Продолжительность фильма должна быть положительной");
             throw new ValidationException("Продолжительность фильма должна быть положительной");
         }
-        if (film.getRating() == null) {
-            log.error("Фильм должен иметь рейтинг MPA");
-            throw new ValidationException("Фильм должен иметь рейтинг MPA");
-        }
 
         // Дополнительная проверка рейтинга
-        validateRatingExists(film.getRating().getId());
-
-        // Проверка жанров
-        if (film.getGenres() == null || film.getGenres().isEmpty()) {
-            log.error("Фильм должен относиться хотя бы к одному жанру");
-            throw new ValidationException("Фильм должен относиться хотя бы к одному жанру");
+        if (film.getMpa() != null && film.getMpa().getId() != null) {
+            validateRatingExists(film.getMpa().getId());
         }
-        for (Genre genre : film.getGenres()) {
-            validateGenreExists(genre.getId());
+
+        if (film.getGenres() != null) {
+            for (Genre genre : film.getGenres()) {
+                validateGenreExists(genre.getId());
+
+            }
+
         }
 
     }
@@ -189,7 +187,6 @@ public class EntityValidator {
     public void validateFriendshipOperation(Long userId, Long friendId) {
         validateUserExists(userId);
         validateUserExists(friendId);
-
         if (userId == friendId) {
             log.error("Пользователь не может добавить самого себя в друзья");
             throw new ValidationException("Пользователь не может добавить самого себя в друзья");
@@ -197,40 +194,11 @@ public class EntityValidator {
     }
 
 
-    // Проверка существования дружбы
-    public void validateFriendshipExists(Long userId, Long friendId) {
-        validateFriendshipOperation(userId, friendId);
-
-        if (!friendshipRepository.existsByUserIdAndFriendId(userId, friendId)) {
-            log.error("Запрос на дружбу не найден");
-            throw new NotFoundException("Запрос на дружбу не найден");
-        }
-    }
-
     // Проверка операции с лайками
     public void validateLikeOperation(Long filmId, Long userId) {
         validateFilmExists(filmId);
         validateUserExists(userId);
     }
-
-    public void validateUserLoginUniqueness(User user) {
-        if (user.getLogin() == null || user.getLogin().isBlank()) {
-            log.error("Логин не может быть пустым");
-            throw new ValidationException("Логин не может быть пустым");
-        }
-
-        boolean exists = userRepository.existsByLogin(user.getLogin());
-        if (exists) {
-            log.error("Этот логин уже используется: {}", user.getLogin());
-            throw new DuplicatedDataException("Этот логин уже используется: " + user.getLogin());
-        }
-    }
-
-
-
-
-
-
 
 }
 

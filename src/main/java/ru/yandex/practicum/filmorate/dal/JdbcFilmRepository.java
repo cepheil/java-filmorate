@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dal.mappers.FilmRowMapper;
+import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 
@@ -12,6 +13,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Repository
@@ -28,13 +30,13 @@ public class JdbcFilmRepository extends BaseRepository<Film> implements FilmRepo
     private static final String UPDATE_QUERY =
             "UPDATE films SET name = ?, description = ?, release_date = ?, duration = ?, mpa_id = ? WHERE id = ?";
     private static final String FIND_ALL_QUERY =
-            "SELECT f.*, rm.name AS mpa_name FROM  films AS f INNER JOIN ratings_mpa AS rm ON f.mpa_id = rm.mpa_id";
+            "SELECT f.*, rm.name AS mpa_name FROM  films AS f LEFT JOIN ratings_mpa AS rm ON f.mpa_id = rm.mpa_id";
     private static final String DELETE_QUERY =
             "DELETE FROM films WHERE id = ?";
     private static final String FIND_BY_FILM_ID_QUERY = """
             SELECT f.*, rm.name AS mpa_name
             FROM  films AS f
-            INNER JOIN ratings_mpa AS rm ON f.mpa_id = rm.mpa_id
+            LEFT JOIN ratings_mpa AS rm ON f.mpa_id = rm.mpa_id
             WHERE f.id = ?""";
     private static final String GET_POPULAR_FILM_QUERY = """
             SELECT f.*, rm.name AS mpa_name
@@ -50,8 +52,14 @@ public class JdbcFilmRepository extends BaseRepository<Film> implements FilmRepo
             "INSERT INTO film_genre (film_id, genre_id) VALUES (?, ?)";
     private static final String DELETE_GENRES_QUERY =
             "DELETE FROM film_genre WHERE film_id = ?";
-    private static final String FIND_GENRES_BY_FILM_QUERY =
-            "SELECT g.genre_id, g.name FROM film_genre AS fg JOIN genres AS g ON fg.genre_id = g.genre_id WHERE fg.film_id = ?";
+    private static final String FIND_GENRES_BY_FILM_QUERY = """
+            SELECT g.genre_id, g.name
+            FROM film_genre AS fg
+            JOIN genres AS g ON fg.genre_id = g.genre_id
+            WHERE fg.film_id = ?
+            ORDER BY g.genre_id
+            """;
+    ;
     private static final String FIND_LIKES_BY_FILM_QUERY =
             "SELECT user_id FROM likes WHERE film_id = ?";
 
@@ -72,20 +80,26 @@ public class JdbcFilmRepository extends BaseRepository<Film> implements FilmRepo
 
     @Override
     public Film create(Film film) {
+        if (film.getDescription() == null) film.setDescription("");
+        if (film.getGenres() == null) film.setGenres(new HashSet<>());
+        if (film.getLikes() == null) film.setLikes(new HashSet<>());
+
         Long id = insert(
                 INSERT_QUERY,
                 film.getName(),
                 film.getDescription(),
                 film.getReleaseDate(),
                 film.getDuration(),
-                film.getRating().getId() // в таблицу вставляем ID рейтинга
+                film.getMpa().getId()
         );
         film.setId(id);
         // 2. Сохраняем жанры  add  list <Genre>
         saveGenres(film);
         // 3. Сохраняем лайки
         saveLikes(film);
-        return film;
+        return findById(id).orElseThrow(() ->
+                new InternalServerException("Фильм не найден после создания")
+        );
     }
 
     @Override
@@ -95,13 +109,15 @@ public class JdbcFilmRepository extends BaseRepository<Film> implements FilmRepo
                 film.getDescription(),
                 film.getReleaseDate(),
                 film.getDuration(),
-                film.getRating().getId(),
+                film.getMpa().getId(),
                 film.getId()
         );
 
         saveGenres(film);
         saveLikes(film);
-        return film;
+        return findById(film.getId()).orElseThrow(() ->
+                new InternalServerException("Фильм не найден после обновления")
+        );
     }
 
     @Override
@@ -139,15 +155,17 @@ public class JdbcFilmRepository extends BaseRepository<Film> implements FilmRepo
 
 
     private void loadAdditionalData(Film film) {
-        List<Genre> genres = jdbc.query(
+        Set<Genre> genres = new LinkedHashSet<>(jdbc.query(
                 FIND_GENRES_BY_FILM_QUERY,
                 (rs, rowNum) -> new Genre(
                         rs.getLong("genre_id"),
                         rs.getString("name")
                 ),
                 film.getId()
-        );
-        film.setGenres(genres);
+        ));
+
+        System.out.println("Loaded genres for film " + film.getId() + ": " + genres);
+        film.setGenres(new LinkedHashSet<>(genres));
 
         Set<Long> likes = new HashSet<>(jdbc.query(
                 FIND_LIKES_BY_FILM_QUERY,
@@ -159,33 +177,33 @@ public class JdbcFilmRepository extends BaseRepository<Film> implements FilmRepo
     }
 
     private void saveGenres(Film film) {
-        // удаляем старые жанры
-        jdbc.update(DELETE_GENRES_QUERY, film.getId());
-
-        Set<Long> uniqueGenreIds = new HashSet<>();
-        List<Genre> uniqueGenres = new ArrayList<>();
-        // осталвляем уникальные
-        for (Genre genre : film.getGenres()) {
-            if (uniqueGenreIds.add(genre.getId())) {
-                uniqueGenres.add(genre);
-            }
-        }
-        if (!uniqueGenres.isEmpty()) {
+        jdbc.update(DELETE_GENRES_QUERY, film.getId()); // удаляем старые жанры
+        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
+            List<Genre> uniqueGenres = film.getGenres()
+                    .stream()
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.collectingAndThen(
+                            Collectors.toMap(
+                                    Genre::getId,
+                                    g -> g,
+                                    (g1, g2) -> g1,
+                                    LinkedHashMap::new
+                            ),
+                            map -> new ArrayList<>(map.values())
+                    ));
             jdbc.batchUpdate(
                     INSERT_GENRES_QUERY,
                     new BatchPreparedStatementSetter() {
                         @Override
                         public void setValues(PreparedStatement ps, int i) throws SQLException {
-                            Genre genre = uniqueGenres.get(i);
                             ps.setLong(1, film.getId());
-                            ps.setLong(2, genre.getId());
+                            ps.setLong(2, uniqueGenres.get(i).getId());
                         }
 
                         @Override
                         public int getBatchSize() {
                             return uniqueGenres.size();
                         }
-
                     }
             );
         }

@@ -14,7 +14,7 @@ public class JdbcLikeRepository implements LikeRepository {
 
     @Override
     public int addLike(Long filmId, Long userId) {
-        String sqlAdd = "INSERT INTO likes (film_id, user_id) VALUES (?, ?) ON CONFLICT DO NOTHING";
+        String sqlAdd = "MERGE INTO likes (film_id, user_id) KEY(film_id, user_id) VALUES (?, ?)";
         return jdbc.update(sqlAdd, filmId, userId);
     }
 

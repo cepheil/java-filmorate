@@ -12,8 +12,8 @@ import java.util.Optional;
 @Repository
 @Qualifier("jdbc")
 public class JdbcGenreRepository extends BaseRepository<Genre> implements GenreRepository {
-    private static final String FIND_ALL_QUERY = "SELECT * FROM genres";
-    private static final String FIND_BY_ID_QUERY = "SELECT * FROM genres WHERE genre_id = ?";
+    private static final String FIND_ALL_QUERY = "SELECT * FROM genres ORDER BY genre_id";
+    private static final String FIND_BY_ID_QUERY = "SELECT * FROM genres WHERE genre_id = ? ORDER BY genre_id";
 
 
     public JdbcGenreRepository(JdbcTemplate jdbc, GenreRowMapper mapper) {

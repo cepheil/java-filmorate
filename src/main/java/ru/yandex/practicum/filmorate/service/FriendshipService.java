@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dal.FriendshipRepository;
-import ru.yandex.practicum.filmorate.dal.UserRepository;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
@@ -29,20 +28,10 @@ public class FriendshipService {
     }
 
 
-    public void confirmFriend(Long userId, Long friendId) {
-        log.info("PUT /users/{userId}/friends/{friendId}/confirm  Подтверждение дружбы между {}  и  {}",
-                userId, friendId);
-        entityValidator.validateFriendshipOperation(userId, friendId); // Наличие в базе обоих U. и U!=F
-        jdbcFriendshipRepository.confirmFriend(userId, friendId);
-        log.info("Пользователь {} подтвердил дружбу с {}", userId, friendId);
-    }
-
-
     public void removeFriend(Long userId, Long friendId) {
         log.info("DELETE /users/{id}/friends/{friendId} - Удаление из друзей пользователя: {}, друга: {}",
                 userId, friendId);
         entityValidator.validateFriendshipOperation(userId, friendId);
-        entityValidator.validateFriendshipExists(userId, friendId);
         jdbcFriendshipRepository.removeFriend(userId, friendId);
         log.info("Пользователи: {} и {}  -  уже не друзья", userId, friendId);
     }
@@ -60,6 +49,15 @@ public class FriendshipService {
                 id, otherId);
         entityValidator.validateFriendshipOperation(id, otherId);
         return jdbcFriendshipRepository.getCommonFriends(id, otherId);
+    }
+
+
+    public void confirmFriend(Long userId, Long friendId) {
+        log.info("PUT /users/{userId}/friends/{friendId}/confirm  Подтверждение дружбы между {}  и  {}",
+                userId, friendId);
+        entityValidator.validateFriendshipOperation(userId, friendId); // Наличие в базе обоих U. и U!=F
+        jdbcFriendshipRepository.getCommonFriends(userId, friendId);
+        log.info("Пользователь {} подтвердил дружбу с {}", userId, friendId);
     }
 
 

@@ -64,7 +64,6 @@ public class JdbcUserRepository extends BaseRepository<User> implements UserRepo
     }
 
 
-
     @Override
     public boolean existsById(long id) {
         String sql = "SELECT COUNT(*) FROM users WHERE id = ?";

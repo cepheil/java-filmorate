@@ -8,7 +8,7 @@ public interface FriendshipRepository {
 
     void addFriend(Long userId, Long friendId);
 
-    void confirmFriend(Long userId, Long friendId);
+    void confirmFriendship(Long userId, Long friendId);
 
     void removeFriend(Long userId, Long friendId);
 
@@ -16,5 +16,6 @@ public interface FriendshipRepository {
 
     Collection<User> getCommonFriends(Long userId, Long otherUserId);
 
-    boolean existsByUserIdAndFriendId(Long userId, Long friendId);
+    boolean hasFriendship(Long userId, Long friendId);
+
 }

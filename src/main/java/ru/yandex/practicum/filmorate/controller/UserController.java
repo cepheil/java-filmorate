@@ -51,11 +51,6 @@ public class UserController {
     }
 
 
-    /*
-PUT /users/{userId}/friends/{friendId}
-userId - кто отправляет запрос
-friendId - кому отправляют запрос
-*/
     @PutMapping("/{userId}/friends/{friendId}")
     public void addFriend(@PathVariable @Positive Long userId,
                           @PathVariable @Positive Long friendId) {
