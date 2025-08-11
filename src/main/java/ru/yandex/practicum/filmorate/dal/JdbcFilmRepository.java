@@ -59,7 +59,6 @@ public class JdbcFilmRepository extends BaseRepository<Film> implements FilmRepo
             WHERE fg.film_id = ?
             ORDER BY g.genre_id
             """;
-    ;
     private static final String FIND_LIKES_BY_FILM_QUERY =
             "SELECT user_id FROM likes WHERE film_id = ?";
 
