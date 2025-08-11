@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmRepository;
-import ru.yandex.practicum.filmorate.storage.like.LikeRepository;
 
 import java.util.Collection;
 
@@ -17,7 +16,7 @@ import java.util.Collection;
 public class FilmService {
     private final ValidationService validationService;
     private final FilmRepository filmRepository;
-    private final LikeRepository likeRepository;
+    private final LikeService likeService;
 
     public Collection<Film> findAllFilms() {
         log.info("Попытка получения всех фильмов");
@@ -60,14 +59,14 @@ public class FilmService {
         validationService.validateFilmAndUserIds(filmId, userId);
         validationService.validateFilmExists(filmId);
         validationService.validateUserExists(userId);
-        likeRepository.addLike(filmId, userId);
+        likeService.addLike(filmId, userId);
         log.info("Пользователь {} поставил лайк фильму {}", userId, filmId);
     }
 
     public void removeLike(Long filmId, Long userId) {
         log.info("Попытка удаления лайка у фильма {} от пользователя {}", filmId, userId);
         validationService.validateFilmAndUserIds(filmId, userId);
-        likeRepository.removeLike(filmId, userId);
+        likeService.removeLike(filmId, userId);
         log.info("Пользователь {} убрал лайк у фильма {}", userId, filmId);
     }
 }
