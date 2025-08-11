@@ -133,19 +133,19 @@ public class EntityValidator {
 
     }
 
-    public void validateFilmUniqueness(Film film) {
-        // Проверяем, существует ли фильм с таким же названием и датой релиза
-        boolean exists = filmRepository.existsByNameAndReleaseDate(
-                film.getName(),
-                film.getReleaseDate()
-        );
-        if (exists) {
-            log.error("Фильм {} c датой релиза {} уже существует", film.getName(), film.getReleaseDate());
-            throw new DuplicatedDataException(
-                    "Фильм '" + film.getName() + "' (" + film.getReleaseDate() + ") уже существует"
-            );
-        }
-    }
+//    public void validateFilmUniqueness(Film film) {
+//        // Проверяем, существует ли фильм с таким же названием и датой релиза
+//        boolean exists = filmRepository.existsByNameAndReleaseDate(
+//                film.getName(),
+//                film.getReleaseDate()
+//        );
+//        if (exists) {
+//            log.error("Фильм {} c датой релиза {} уже существует", film.getName(), film.getReleaseDate());
+//            throw new DuplicatedDataException(
+//                    "Фильм '" + film.getName() + "' (" + film.getReleaseDate() + ") уже существует"
+//            );
+//        }
+//    }
 
 
     // Проверка существования фильма

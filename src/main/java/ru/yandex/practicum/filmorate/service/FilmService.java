@@ -26,7 +26,7 @@ public class FilmService {
     public Film createFilm(Film film) {
         log.info("POST /films добавление фильма: {}", film.getName());
         entityValidator.validateFilm(film);
-        entityValidator.validateFilmUniqueness(film);
+        //entityValidator.validateFilmUniqueness(film);
         Film createdFilm = jdbcFilmRepository.create(film);
         log.info("Фильм: {} , ID: {} , добавлен!", createdFilm.getName(), createdFilm.getId());
         return createdFilm;
