@@ -23,14 +23,14 @@ public class GenreController {
 
     //    GET /genres — возвращает список объектов содержащих жанр
     @GetMapping
-    public Collection<Genre> findAllGenres(){
+    public Collection<Genre> findAllGenres() {
         return genreService.findAllGenres();
     }
 
 
     //    GET /genres/{id} возвращает объект содержащий жанр с идентификатором id
     @GetMapping("/{id}")
-    public Genre findGenreById (@PathVariable @Positive Long id) {
+    public Genre findGenreById(@PathVariable @Positive Long id) {
         return genreService.findGenreById(id);
     }
 
