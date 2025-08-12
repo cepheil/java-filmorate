@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.dal;
 
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.time.LocalDate;
+
 import java.util.Collection;
 import java.util.Optional;
 
@@ -22,5 +22,4 @@ public interface FilmRepository {
 
     boolean existsById(long id);
 
-    boolean existsByNameAndReleaseDate(String name, LocalDate releaseDate);
 }

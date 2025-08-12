@@ -1,9 +1,11 @@
 package ru.yandex.practicum.filmorate.dal;
 
 
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 
 public interface GenreRepository {
@@ -12,6 +14,8 @@ public interface GenreRepository {
 
     Optional<Genre> findById(Long id);
 
-    boolean existsById(long id);
+    void loadGenresForFilms(Map<Long, Film> filmMap);
+
+    boolean existsAllByIds(Collection<Long> ids);
 
 }

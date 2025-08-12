@@ -4,14 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dal.FilmRepository;
+import ru.yandex.practicum.filmorate.dal.GenreRepository;
 import ru.yandex.practicum.filmorate.dal.LikeRepository;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.util.Collection;
-import java.util.Comparator;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -21,13 +21,16 @@ public class FilmService {
     private final FilmRepository jdbcFilmRepository;
     private final LikeRepository jdbcLikeRepository;
     private final EntityValidator entityValidator;
+    private final GenreRepository jdbcGenreRepository;
 
 
     public Film createFilm(Film film) {
         log.info("POST /films добавление фильма: {}", film.getName());
         entityValidator.validateFilm(film);
-        //entityValidator.validateFilmUniqueness(film);
         Film createdFilm = jdbcFilmRepository.create(film);
+        jdbcLikeRepository.removeAllLikes(film.getId());
+        jdbcLikeRepository.addLikesBatch(film.getId(), film.getLikes());
+        loadAdditionalData(List.of(createdFilm));
         log.info("Фильм: {} , ID: {} , добавлен!", createdFilm.getName(), createdFilm.getId());
         return createdFilm;
     }
@@ -38,6 +41,8 @@ public class FilmService {
         entityValidator.validateFilmExists(newFilm.getId());
         entityValidator.validateFilm(newFilm);
         Film updatedFilm = jdbcFilmRepository.update(newFilm);
+        jdbcLikeRepository.removeAllLikes(newFilm.getId());
+        jdbcLikeRepository.addLikesBatch(newFilm.getId(), newFilm.getLikes());
         log.info("Фильм с ID {} успешно обновлён", newFilm.getId());
         return updatedFilm;
     }
@@ -45,10 +50,14 @@ public class FilmService {
 
     public Collection<Film> getAllFilms() {
         log.info("GET /films - получение списка всех фильмов");
-        return jdbcFilmRepository.findAll()
-                .stream()
-                .sorted(Comparator.comparing(Film::getId))
-                .collect(Collectors.toList());
+        List<Film> allFilms = new ArrayList<>(jdbcFilmRepository.findAll());
+        if (allFilms.isEmpty()) {
+            log.info("GET /films. Получена пустая коллекция");
+            return allFilms;
+        }
+        loadAdditionalData(allFilms);
+        log.info("по запросу GET /films получена коллекция из  {} фильмов", allFilms.size());
+        return allFilms;
     }
 
 
@@ -58,8 +67,11 @@ public class FilmService {
             log.error("Запрос фильма с null-ID отклонён");
             throw new ValidationException("ID фильма не может быть null");
         }
-        return jdbcFilmRepository.findById(id)
+        Film film = jdbcFilmRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Фильм с ID=" + id + " не найден"));
+        loadAdditionalData(List.of(film));
+        log.info("GET /films/{filmId} - получен  фильм ID={}, name={}", id, film.getName());
+        return film;
     }
 
 
@@ -83,7 +95,24 @@ public class FilmService {
             log.error("Запрос популярных фильмов с невалидным count={}", count);
             throw new ValidationException("Количество должно быть больше нуля. count =" + count);
         }
-        return jdbcFilmRepository.getPopularFilms(count);
+        List<Film> popularFilms = new ArrayList<>(jdbcFilmRepository.getPopularFilms(count));
+        if (popularFilms.isEmpty()) {
+            log.info("GET /films/popular?count={}. Получена пустая коллекция", count);
+            return popularFilms;
+        }
+        loadAdditionalData(popularFilms);
+        log.info("по запросу GET /films/popular?count={}" +
+                " получена коллекция из {} популярных фильмов", count, popularFilms.size());
+        return popularFilms;
+    }
+
+
+    private void loadAdditionalData(List<Film> films) {
+        Map<Long, Film> filmMap = films
+                .stream()
+                .collect(Collectors.toMap(Film::getId, f -> f));
+        jdbcGenreRepository.loadGenresForFilms(filmMap);
+        jdbcLikeRepository.loadLikesForFilms(filmMap);
     }
 
 

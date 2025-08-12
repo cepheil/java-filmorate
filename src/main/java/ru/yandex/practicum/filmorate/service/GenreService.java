@@ -14,7 +14,6 @@ import java.util.Collection;
 @Service
 @RequiredArgsConstructor
 public class GenreService {
-    private final EntityValidator entityValidator;
     private final GenreRepository jdbcGenreRepository;
 
     public Collection<Genre> findAllGenres() {
@@ -24,7 +23,6 @@ public class GenreService {
 
     public Genre findGenreById(Long id) {
         log.info("GET /genres/{id} - получение жанра с идентификатором id");
-        entityValidator.validateGenreExists(id);
         return jdbcGenreRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Жанр с ID=" + id + " не найден"));
     }

@@ -11,7 +11,6 @@ import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -19,9 +18,6 @@ import java.util.stream.Collectors;
 @Repository
 @Qualifier("jdbc")
 public class JdbcFilmRepository extends BaseRepository<Film> implements FilmRepository {
-    private final JdbcGenreRepository genreRepository;
-    private final JdbcLikeRepository likeRepository;
-    private final JdbcRatingMpaRepository ratingRepository;
 
 
     private static final String INSERT_QUERY =
@@ -52,35 +48,17 @@ public class JdbcFilmRepository extends BaseRepository<Film> implements FilmRepo
             "INSERT INTO film_genre (film_id, genre_id) VALUES (?, ?)";
     private static final String DELETE_GENRES_QUERY =
             "DELETE FROM film_genre WHERE film_id = ?";
-    private static final String FIND_GENRES_BY_FILM_QUERY = """
-            SELECT g.genre_id, g.name
-            FROM film_genre AS fg
-            JOIN genres AS g ON fg.genre_id = g.genre_id
-            WHERE fg.film_id = ?
-            ORDER BY g.genre_id
-            """;
-    private static final String FIND_LIKES_BY_FILM_QUERY =
-            "SELECT user_id FROM likes WHERE film_id = ?";
 
 
-    public JdbcFilmRepository(
-            JdbcTemplate jdbc,
-            FilmRowMapper mapper,
-            JdbcGenreRepository genreRepository,
-            JdbcLikeRepository likeRepository,
-            JdbcRatingMpaRepository ratingRepository
-    ) {
+    public JdbcFilmRepository(JdbcTemplate jdbc, FilmRowMapper mapper) {
         super(jdbc, mapper);
-        this.genreRepository = genreRepository;
-        this.likeRepository = likeRepository;
-        this.ratingRepository = ratingRepository;
     }
 
 
     @Override
     public Film create(Film film) {
         if (film.getDescription() == null) film.setDescription("");
-        if (film.getGenres() == null) film.setGenres(new HashSet<>());
+        if (film.getGenres() == null) film.setGenres(new ArrayList<>());
         if (film.getLikes() == null) film.setLikes(new HashSet<>());
 
         Long id = insert(
@@ -94,8 +72,7 @@ public class JdbcFilmRepository extends BaseRepository<Film> implements FilmRepo
         film.setId(id);
         // 2. Сохраняем жанры  add  list <Genre>
         saveGenres(film);
-        // 3. Сохраняем лайки
-        saveLikes(film);
+
         return findById(id).orElseThrow(() ->
                 new InternalServerException("Фильм не найден после создания")
         );
@@ -113,7 +90,6 @@ public class JdbcFilmRepository extends BaseRepository<Film> implements FilmRepo
         );
 
         saveGenres(film);
-        saveLikes(film);
         return findById(film.getId()).orElseThrow(() ->
                 new InternalServerException("Фильм не найден после обновления")
         );
@@ -122,7 +98,6 @@ public class JdbcFilmRepository extends BaseRepository<Film> implements FilmRepo
     @Override
     public Collection<Film> findAll() {
         Collection<Film> films = findMany(FIND_ALL_QUERY);
-        films.forEach(this::loadAdditionalData);
         return films;
     }
 
@@ -133,15 +108,13 @@ public class JdbcFilmRepository extends BaseRepository<Film> implements FilmRepo
 
     @Override
     public Optional<Film> findById(Long id) {
-        Optional<Film> filmOtional = findOne(FIND_BY_FILM_ID_QUERY, id);
-        filmOtional.ifPresent(this::loadAdditionalData);
-        return filmOtional;
+        Optional<Film> filmOptional = findOne(FIND_BY_FILM_ID_QUERY, id);
+        return filmOptional;
     }
 
     @Override
     public Collection<Film> getPopularFilms(int count) {
         Collection<Film> films = findMany(GET_POPULAR_FILM_QUERY, count);
-        films.forEach(this::loadAdditionalData);
         return films;
     }
 
@@ -152,44 +125,20 @@ public class JdbcFilmRepository extends BaseRepository<Film> implements FilmRepo
         return count != null && count > 0;
     }
 
-
-    private void loadAdditionalData(Film film) {
-        Set<Genre> genres = new LinkedHashSet<>(jdbc.query(
-                FIND_GENRES_BY_FILM_QUERY,
-                (rs, rowNum) -> new Genre(
-                        rs.getLong("genre_id"),
-                        rs.getString("name")
-                ),
-                film.getId()
-        ));
-
-        System.out.println("Loaded genres for film " + film.getId() + ": " + genres);
-        film.setGenres(new LinkedHashSet<>(genres));
-
-        Set<Long> likes = new HashSet<>(jdbc.query(
-                FIND_LIKES_BY_FILM_QUERY,
-                (rs, rowNum) -> rs.getLong("user_id"),
-                film.getId()
-        ));
-        film.setLikes(likes);
-
-    }
-
     private void saveGenres(Film film) {
         jdbc.update(DELETE_GENRES_QUERY, film.getId()); // удаляем старые жанры
         if (film.getGenres() != null && !film.getGenres().isEmpty()) {
             List<Genre> uniqueGenres = film.getGenres()
                     .stream()
                     .filter(Objects::nonNull)
-                    .collect(Collectors.collectingAndThen(
-                            Collectors.toMap(
-                                    Genre::getId,
-                                    g -> g,
-                                    (g1, g2) -> g1,
-                                    LinkedHashMap::new
-                            ),
-                            map -> new ArrayList<>(map.values())
-                    ));
+                    .collect(Collectors.toMap(
+                            Genre::getId,
+                            g -> g,
+                            (g1, g2) -> g1,
+                            LinkedHashMap::new
+                    ))
+                    .values().stream().collect(Collectors.toList());
+
             jdbc.batchUpdate(
                     INSERT_GENRES_QUERY,
                     new BatchPreparedStatementSetter() {
@@ -208,29 +157,5 @@ public class JdbcFilmRepository extends BaseRepository<Film> implements FilmRepo
         }
 
     }
-
-
-    private void saveLikes(Film film) {
-        // Удаляем старые лайки
-        likeRepository.removeAllLikes(film.getId());
-
-        // Добавляем новые лайки
-        for (Long userId : film.getLikes()) {
-            likeRepository.addLike(film.getId(), userId);
-        }
-    }
-
-    @Override
-    public boolean existsByNameAndReleaseDate(String name, LocalDate releaseDate) {
-        String sql = "SELECT COUNT(*) FROM films WHERE LOWER(TRIM(name)) = LOWER(TRIM(?)) AND release_date = ?";
-        Integer count = jdbc.queryForObject(
-                sql,
-                Integer.class,
-                name.trim(),
-                releaseDate
-        );
-        return count != null && count > 0;
-    }
-
 
 }

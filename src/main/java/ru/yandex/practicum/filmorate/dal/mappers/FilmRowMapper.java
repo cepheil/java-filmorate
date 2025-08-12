@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.RatingMpa;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashSet;
 
 @Component
@@ -28,7 +29,7 @@ public class FilmRowMapper implements RowMapper<Film> {
             film.setMpa(new RatingMpa(ratingId, ratingName));
         }
 
-        film.setGenres(new HashSet<>());
+        film.setGenres(new ArrayList<>());
         film.setLikes(new HashSet<>());
 
         return film;

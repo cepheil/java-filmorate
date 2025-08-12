@@ -12,6 +12,9 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -124,28 +127,22 @@ public class EntityValidator {
         }
 
         if (film.getGenres() != null) {
-            for (Genre genre : film.getGenres()) {
-                validateGenreExists(genre.getId());
-
-            }
-
+            validateFilmGenres(film.getGenres());
         }
-
     }
 
-//    public void validateFilmUniqueness(Film film) {
-//        // Проверяем, существует ли фильм с таким же названием и датой релиза
-//        boolean exists = filmRepository.existsByNameAndReleaseDate(
-//                film.getName(),
-//                film.getReleaseDate()
-//        );
-//        if (exists) {
-//            log.error("Фильм {} c датой релиза {} уже существует", film.getName(), film.getReleaseDate());
-//            throw new DuplicatedDataException(
-//                    "Фильм '" + film.getName() + "' (" + film.getReleaseDate() + ") уже существует"
-//            );
-//        }
-//    }
+
+    public void validateFilmGenres(List<Genre> genres) {
+        if (genres == null || genres.isEmpty()) return;
+
+        Set<Long> genreIds = genres.stream()
+                .map(Genre::getId)
+                .collect(Collectors.toSet());
+
+        if (!genreRepository.existsAllByIds(genreIds)) {
+            throw new NotFoundException("Один или несколько жанров не найдены");
+        }
+    }
 
 
     // Проверка существования фильма
@@ -171,17 +168,6 @@ public class EntityValidator {
         }
     }
 
-    // Проверка существования жанра
-    public void validateGenreExists(Long genreId) {
-        if (genreId == null) {
-            log.error("ID жанра не может быть null");
-            throw new ValidationException("ID жанра не может быть null");
-        }
-        if (!genreRepository.existsById(genreId)) {
-            log.error("Жанр: {}  не найден", genreId);
-            throw new NotFoundException("Жанр с ID=" + genreId + " не найден");
-        }
-    }
 
     // Проверка операции с друзьями
     public void validateFriendshipOperation(Long userId, Long friendId) {

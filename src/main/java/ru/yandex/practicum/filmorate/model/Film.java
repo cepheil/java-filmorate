@@ -4,7 +4,9 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -27,7 +29,7 @@ public class Film {
     private Long duration;
 
     //@NotEmpty(message = "Фильм должен относиться хотя бы к одному жанру")
-    private Set<Genre> genres = new HashSet<>();
+    private List<Genre> genres = new ArrayList<>();
 
     @NotNull(message = "фильм должен иметь рейтинг")
     private RatingMpa mpa;
