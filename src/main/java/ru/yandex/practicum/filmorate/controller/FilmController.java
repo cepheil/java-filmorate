@@ -18,6 +18,18 @@ public class FilmController {
     private final FilmService filmService;
 
 
+    @PostMapping
+    public Film createFilm(@Valid @RequestBody Film film) {
+        return filmService.createFilm(film);
+    }
+
+
+    @PutMapping
+    public Film updateFilm(@Valid @RequestBody Film newFilm) {
+        return filmService.updateFilm(newFilm);
+    }
+
+
     @GetMapping
     public Collection<Film> getAllFilms() {
         return filmService.getAllFilms();
@@ -31,15 +43,10 @@ public class FilmController {
     }
 
 
-    @PostMapping
-    public Film createFilm(@Valid @RequestBody Film film) {
-        return filmService.createFilm(film);
-    }
-
-
-    @PutMapping
-    public Film updateFilm(@Valid @RequestBody Film newFilm) {
-        return filmService.updateFilm(newFilm);
+    //DELETE /films/{filmId}
+    @DeleteMapping("/{filmId}")
+    public void deleteFilm(@PathVariable @Positive Long filmId) {
+        filmService.deleteFilm(filmId);
     }
 
 
@@ -55,14 +62,15 @@ public class FilmController {
     public void addLike(@PathVariable @Positive Long filmId,
                         @PathVariable @Positive Long userId) {
         filmService.addLike(filmId, userId);
-
     }
 
 
+    //DELETE /films/{id}/like/{userId}
     @DeleteMapping("/{filmId}/like/{userId}")
     public void removeLike(@PathVariable @Positive Long filmId,
                            @PathVariable @Positive Long userId) {
         filmService.removeLike(filmId, userId);
     }
+
 
 }
