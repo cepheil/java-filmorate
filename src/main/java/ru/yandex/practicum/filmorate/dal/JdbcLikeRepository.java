@@ -49,8 +49,7 @@ public class JdbcLikeRepository implements LikeRepository {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
                 ps.setLong(1, filmId);
-                ps.setLong(2, userIds.
-                        stream()
+                ps.setLong(2, userIds.stream()
                         .toList()
                         .get(i));
             }
