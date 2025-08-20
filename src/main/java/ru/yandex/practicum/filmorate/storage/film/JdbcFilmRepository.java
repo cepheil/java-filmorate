@@ -229,6 +229,7 @@ public class JdbcFilmRepository extends BaseNamedParameterRepository<Film> imple
             """;
 
     public JdbcFilmRepository(NamedParameterJdbcOperations jdbc, RowMapper<Film> mapper) {
+    public JdbcFilmRepository(NamedParameterJdbcOperations jdbc, RowMapper<Film> mapper) {
         super(jdbc, mapper);
     }
 

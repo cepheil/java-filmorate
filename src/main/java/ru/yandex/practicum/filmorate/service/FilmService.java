@@ -6,11 +6,18 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.director.DirectorRepository;
 import ru.yandex.practicum.filmorate.storage.film.FilmRepository;
 import ru.yandex.practicum.filmorate.storage.genre.GenreRepository;
+import ru.yandex.practicum.filmorate.storage.review.ReviewRepository;
+import ru.yandex.practicum.filmorate.storage.genre.GenreRepository;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -27,6 +34,14 @@ public class FilmService {
 
     public Collection<Film> findAllFilms() {
         log.info("Попытка получения всех фильмов");
+        Collection<Film> films = filmRepository.findAllFilms();
+        for (Film film : films) {
+            Set<Genre> genres = genreRepository.findGenreByFilmId(film.getId());
+            film.setGenres(genres);
+            List<Review> reviews = reviewRepository.getReviewsByFilmId(film.getId(), Integer.MAX_VALUE);
+            film.setReviews(reviews);
+        }
+        return films;
 
         List<Film> allFilms = new ArrayList<>(filmRepository.findAllFilms());
         if (allFilms.isEmpty()) {
@@ -43,6 +58,11 @@ public class FilmService {
         validationService.validateFilmExists(filmId);
         Film film = filmRepository.getFilmById(filmId)
                 .orElseThrow(() -> new NotFoundException("Фильм с ID " + filmId + " не найден"));
+        Set<Genre> genres = genreRepository.findGenreByFilmId(filmId);
+        film.setGenres(genres);
+        List<Review> reviews = reviewRepository.getReviewsByFilmId(filmId, Integer.MAX_VALUE);
+        film.setReviews(reviews);
+        return film;
         loadAdditionalData(List.of(film));
         log.info("GET /films/{filmId} - получен  фильм ID={}, name={}", filmId, film.getName());
         return film;
