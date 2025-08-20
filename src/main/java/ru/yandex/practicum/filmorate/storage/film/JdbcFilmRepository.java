@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
@@ -20,9 +19,6 @@ import java.util.stream.Collectors;
 @Repository
 @Qualifier("filmRepository")
 public class JdbcFilmRepository extends BaseNamedParameterRepository<Film> implements FilmRepository {
-    @Autowired
-    private GenreRepository genreRepository;
-
     private static final String FIND_ALL_FILMS_QUERY = """
             SELECT f.*, m.mpa_id AS mpa_id, m.name AS mpa_name, m.description AS mpa_description
             FROM films f
@@ -116,6 +112,8 @@ public class JdbcFilmRepository extends BaseNamedParameterRepository<Film> imple
             ORDER BY f.film_id
             """;
 
+    public JdbcFilmRepository(NamedParameterJdbcOperations jdbc, RowMapper<Film> mapper,
+                              GenreRepository genreRepository) {
     private static final String SEARCH_FILMS_BY_TITLE_AND_DIRECTOR_QUERY = """
             SELECT DISTINCT f.*, m.mpa_id AS mpa_id, m.name AS mpa_name, m.description AS mpa_description
             FROM films f
