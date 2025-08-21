@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.Director.DirectorRepository;
 import ru.yandex.practicum.filmorate.storage.film.FilmRepository;
 import ru.yandex.practicum.filmorate.storage.user.UserRepository;
 import ru.yandex.practicum.filmorate.storage.genre.GenreRepository;
@@ -17,6 +18,7 @@ public class ValidationService {
     private final FilmRepository filmRepository;
     private final GenreRepository genreRepository;
     private final MpaRepository mpaRepository;
+    private final DirectorRepository directorRepository;
 
     public void validateUserExists(Long userId) {
         if (userId == null) {
@@ -51,6 +53,7 @@ public class ValidationService {
                 .orElseThrow(() -> new NotFoundException("Фильм с ID " + filmId + " не найден"));
     }
 
+    // обращение к БД в цикле!
     public void validateFilm(Film film) {
         if (film == null) {
             throw new ValidationException("Фильм не может быть null.");
@@ -84,4 +87,14 @@ public class ValidationService {
         mpaRepository.findMpaById(mpaId)
                 .orElseThrow(() -> new NotFoundException("Рейтинг MPA с ID " + mpaId + " не найден"));
     }
+
+    public void validateDirectorExists(Long directorId) {
+        if (directorId == null) {
+            throw new ValidationException("ID режиссера не может быть null");
+        }
+        directorRepository.findDirectorById(directorId)
+                .orElseThrow(() -> new NotFoundException("Режиссер с ID " + directorId + " не найден"));
+    }
+
+
 }

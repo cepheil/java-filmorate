@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.base.BaseNamedParameterRepository;
@@ -61,6 +62,39 @@ public class JdbcFilmRepository extends BaseNamedParameterRepository<Film> imple
     private static final String INSERT_GENRE_FILM_QUERY = """
             INSERT INTO film_genre(film_id, genre_id) VALUES(?, ?)""";
 
+    private static final String FIND_FILMS_BY_DIRECTOR_BY_YEAR_QUERY = """
+            SELECT f.*,
+                   m.mpa_id AS mpa_id,
+                   m.name AS mpa_name,
+                   m.description AS mpa_description
+            FROM films f
+            JOIN mpa_ratings m ON f.mpa_id = m.mpa_id
+            JOIN film_directors fd ON f.film_id = fd.film_id
+            WHERE fd.director_id = :directorId
+            ORDER BY f.release_date ASC
+            """;
+
+    private static final String FIND_FILMS_BY_DIRECTOR_BY_LIKES_QUERY = """
+            SELECT f.*,
+                   m.mpa_id AS mpa_id,
+                   m.name AS mpa_name,
+                   m.description AS mpa_description,
+                   COUNT(l.user_id) AS like_count
+            FROM films f
+            JOIN mpa_ratings m ON f.mpa_id = m.mpa_id
+            JOIN film_directors fd ON f.film_id = fd.film_id
+            LEFT JOIN likes l ON f.film_id = l.film_id
+            WHERE fd.director_id = :directorId
+            GROUP BY f.film_id, f.name, f.description, f.release_date, f.duration, f.mpa_id,
+                     m.mpa_id, m.name, m.description
+            ORDER BY like_count DESC
+            """;
+
+    private static final String DELETE_DIRECTOR_FILM_QUERY = "DELETE FROM film_directors WHERE film_id = :filmId";
+    private static final String INSERT_FILM_DIRECTORS_QUERY = """
+            INSERT INTO film_directors(film_id, director_id) VALUES(?, ?)""";
+
+
     private final GenreRepository genreRepository;
 
     public JdbcFilmRepository(NamedParameterJdbcOperations jdbc, RowMapper<Film> mapper, GenreRepository genreRepository) {
@@ -97,6 +131,7 @@ public class JdbcFilmRepository extends BaseNamedParameterRepository<Film> imple
         long id = insert(INSERT_FILM_QUERY, params);
         film.setId(id);
         updateGenres(film.getGenres(), film.getId());
+        updateDirector(film.getDirectors(), film.getId());
         return film;
     }
 
@@ -112,6 +147,7 @@ public class JdbcFilmRepository extends BaseNamedParameterRepository<Film> imple
 
         update(UPDATE_FILM_QUERY, params);
         updateGenres(newFilm.getGenres(), newFilm.getId());
+        updateDirector(newFilm.getDirectors(), newFilm.getId());
         return newFilm;
     }
 
@@ -128,6 +164,22 @@ public class JdbcFilmRepository extends BaseNamedParameterRepository<Film> imple
         params.put("count", count);
         return findMany(GET_POPULAR_FILM_QUERY, params);
     }
+
+    @Override
+    public Collection<Film> findFilmsByDirectorSortedByYear(Long directorId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("directorId", directorId);
+        return findMany(FIND_FILMS_BY_DIRECTOR_BY_YEAR_QUERY, params);
+    }
+
+
+    @Override
+    public Collection<Film> findFilmsByDirectorSortedByLikes(Long directorId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("directorId", directorId);
+        return findMany(FIND_FILMS_BY_DIRECTOR_BY_LIKES_QUERY, params);
+    }
+
 
     public void updateGenres(Set<Genre> genres, Long filmId) {
         if (!genres.isEmpty()) {
@@ -155,4 +207,33 @@ public class JdbcFilmRepository extends BaseNamedParameterRepository<Film> imple
             );
         }
     }
+
+    public void updateDirector(Set<Director> directors, Long filmId) {
+        if (!directors.isEmpty()) {
+            Map<String, Object> baseParams = new HashMap<>();
+            baseParams.put("filmId", filmId);
+
+            jdbc.update(DELETE_DIRECTOR_FILM_QUERY, baseParams);
+
+            List<Director> directorsList = new ArrayList<>(directors);
+
+            jdbc.getJdbcOperations().batchUpdate(
+                    INSERT_FILM_DIRECTORS_QUERY,
+                    new BatchPreparedStatementSetter() {
+                        @Override
+                        public void setValues(PreparedStatement ps, int i) throws SQLException {
+                            ps.setLong(1, filmId);
+                            ps.setInt(2, Math.toIntExact(directorsList.get(i).getId()));
+                        }
+
+                        @Override
+                        public int getBatchSize() {
+                            return directorsList.size();
+                        }
+                    }
+            );
+        }
+    }
+
+
 }
