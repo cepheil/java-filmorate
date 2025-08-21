@@ -40,7 +40,7 @@ public class FilmService {
     }
 
     public Film getFilmById(Long filmId) {
-        log.info("Попытка получения фильма по ID: {}", filmId); // тут может быть ошибка, если filmId = Null
+        log.info("Попытка получения фильма по ID: {}", filmId);
         validationService.validateFilmExists(filmId);
         Film film = filmRepository.getFilmById(filmId)
                 .orElseThrow(() -> new NotFoundException("Фильм с ID " + filmId + " не найден"));
@@ -66,20 +66,35 @@ public class FilmService {
         return updatedFilm;
     }
 
-    public Collection<Film> getPopularFilms(int count) {
-        log.info("Попытка получения популярных фильмов в количестве {} штук", count);
+    public Collection<Film> getPopularFilms(int count, Long genreId, Integer year) {
+        log.info("Попытка получения популярных фильмов: count={}, genreId={}, year={}", count, genreId, year);
+
         if (count <= 0) {
             throw new ValidationException("Количество фильмов должно быть положительным числом.");
         }
-        List<Film> popularFilms = new ArrayList<>(filmRepository.getPopularFilms(count));
+
+        List<Film> popularFilms;
+        if (genreId != null && year != null) {
+            popularFilms = new ArrayList<>(filmRepository.getPopularFilmsByGenreAndYear(count, genreId, year));
+        } else if (genreId != null) {
+            popularFilms = new ArrayList<>(filmRepository.getPopularFilmsByGenre(count, genreId));
+        } else if (year != null) {
+            popularFilms = new ArrayList<>(filmRepository.getPopularFilmsByYear(count, year));
+        } else {
+            popularFilms = new ArrayList<>(filmRepository.getPopularFilms(count));
+        }
+
         if (popularFilms.isEmpty()) {
             log.info("GET /films/popular?count={}. Получена пустая коллекция", count);
             return popularFilms;
         }
+
         loadAdditionalData(popularFilms);
 
-        log.info("по запросу GET /films/popular?count={}" +
-                 " получена коллекция из {} популярных фильмов", count, popularFilms.size());
+        log.info("по запросу GET /films/popular?count={}&genreId={}&year={} " +
+                 "получена коллекция из {} популярных фильмов",
+                count, genreId, year, popularFilms.size());
+
         return popularFilms;
     }
 

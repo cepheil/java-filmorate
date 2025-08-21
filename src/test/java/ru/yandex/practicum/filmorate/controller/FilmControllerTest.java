@@ -62,24 +62,88 @@ public class FilmControllerTest {
     }
 
     /**
-     * Проверяет, что метод {@link FilmController#getPopulateFilms(int)} возвращает указанное количество фильмов.
+     * Проверяет, что метод {@link FilmController#getPopulateFilms(int, Long, Integer)} возвращает указанное количество фильмов.
      *
-     * <p>Ожидается, что вызов делегируется в {@link FilmService#getPopularFilms(int)}</p>
+     * <p>Ожидается, что вызов делегируется в {@link FilmService#getPopularFilms(int, Long, Integer)}</p>
      */
     @Test
     public void testGetPopulateFilms() {
         int count = 10;
+        Long genreId = null; // фильтрации нет
+        Integer year = null; // фильтрации нет
+
         Film film1 = new Film();
         Film film2 = new Film();
         Collection<Film> popularFilms = Arrays.asList(film1, film2);
 
-        when(filmService.getPopularFilms(count)).thenReturn(popularFilms);
+        when(filmService.getPopularFilms(count, genreId, year)).thenReturn(popularFilms);
 
-        Collection<Film> result = filmController.getPopulateFilms(count);
+        Collection<Film> result = filmController.getPopulateFilms(count, genreId, year);
 
         assertEquals(2, result.size());
-        verify(filmService, times(1)).getPopularFilms(count);
+        verify(filmService, times(1)).getPopularFilms(count, genreId, year);
     }
+
+    /**
+     * Проверка получения популярных фильмов по жанру.
+     */
+    @Test
+    public void testGetPopularFilms_WithGenre() {
+        int count = 5;
+        Long genreId = 1L;
+        Integer year = null;
+
+        Film film = new Film();
+        Collection<Film> popularFilms = Arrays.asList(film);
+
+        when(filmService.getPopularFilms(count, genreId, year)).thenReturn(popularFilms);
+
+        Collection<Film> result = filmController.getPopulateFilms(count, genreId, year);
+
+        assertEquals(1, result.size());
+        verify(filmService, times(1)).getPopularFilms(count, genreId, year);
+    }
+
+    /**
+     * Проверка получения популярных фильмов по году.
+     */
+    @Test
+    public void testGetPopularFilms_WithYear() {
+        int count = 3;
+        Long genreId = null;
+        Integer year = 2000;
+
+        Film film = new Film();
+        Collection<Film> popularFilms = Arrays.asList(film);
+
+        when(filmService.getPopularFilms(count, genreId, year)).thenReturn(popularFilms);
+
+        Collection<Film> result = filmController.getPopulateFilms(count, genreId, year);
+
+        assertEquals(1, result.size());
+        verify(filmService, times(1)).getPopularFilms(count, genreId, year);
+    }
+
+    /**
+     * Проверка получения популярных фильмов по жанру и году.
+     */
+    @Test
+    public void testGetPopularFilms_WithGenreAndYear() {
+        int count = 7;
+        Long genreId = 2L;
+        Integer year = 2010;
+
+        Film film = new Film();
+        Collection<Film> popularFilms = Arrays.asList(film);
+
+        when(filmService.getPopularFilms(count, genreId, year)).thenReturn(popularFilms);
+
+        Collection<Film> result = filmController.getPopulateFilms(count, genreId, year);
+
+        assertEquals(1, result.size());
+        verify(filmService, times(1)).getPopularFilms(count, genreId, year);
+    }
+
 
     /**
      * Проверяет, что метод {@link FilmController#createFilm(Film)} корректно создаёт новый фильм.

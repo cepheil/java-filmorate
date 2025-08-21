@@ -11,6 +11,12 @@ public interface FilmRepository {
 
     Collection<Film> getPopularFilms(int count);
 
+    Collection<Film> getPopularFilmsByGenreAndYear(int count, Long genreId, Integer year);
+
+    Collection<Film> getPopularFilmsByGenre(int count, Long genreId);
+
+    Collection<Film> getPopularFilmsByYear(int count, Integer year);
+
     Film createFilm(Film film);
 
     Film updateFilm(Film newFilm);
