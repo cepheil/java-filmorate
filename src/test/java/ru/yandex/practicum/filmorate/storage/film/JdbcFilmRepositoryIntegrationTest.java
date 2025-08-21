@@ -41,13 +41,14 @@ public class JdbcFilmRepositoryIntegrationTest {
         Film film = Film.builder()
                 .name("Test Film")
                 .description("Test Description")
-                .releaseDate(LocalDate.of(2020,1,1))
+                .releaseDate(LocalDate.of(2020, 1, 1))
                 .duration(120)
                 .mpa(MpaRating.builder().id(1L).name("G").description("General Audiences").build())
                 .genres(new HashSet<>(Arrays.asList(
                         Genre.builder().id(1L).name("Комедия").build(),
                         Genre.builder().id(2L).name("Драма").build()
                 )))
+                .directors(new HashSet<>())
                 .build();
 
         Film createdFilm = filmRepository.createFilm(film);
@@ -56,10 +57,11 @@ public class JdbcFilmRepositoryIntegrationTest {
         assertThat(createdFilm.getId()).isNotNull().isPositive();
         assertThat(createdFilm.getName()).isEqualTo("Test Film");
         assertThat(createdFilm.getDescription()).isEqualTo("Test Description");
-        assertThat(createdFilm.getReleaseDate()).isEqualTo(LocalDate.of(2020,1,1));
+        assertThat(createdFilm.getReleaseDate()).isEqualTo(LocalDate.of(2020, 1, 1));
         assertThat(createdFilm.getDuration()).isEqualTo(120);
         assertThat(createdFilm.getMpa().getId()).isEqualTo(1L);
         assertThat(createdFilm.getGenres()).hasSize(2);
+        assertThat(createdFilm.getDirectors()).isEmpty();
     }
 
     @Test
@@ -67,10 +69,11 @@ public class JdbcFilmRepositoryIntegrationTest {
         Film film = Film.builder()
                 .name("Test Film")
                 .description("Test Description")
-                .releaseDate(LocalDate.of(2020,1,1))
+                .releaseDate(LocalDate.of(2020, 1, 1))
                 .duration(120)
                 .mpa(MpaRating.builder().id(1L).name("G").description("General Audience").build())
                 .genres(new HashSet<>())
+                .directors(new HashSet<>())
                 .build();
 
         Film createdFilm = filmRepository.createFilm(film);
@@ -81,9 +84,10 @@ public class JdbcFilmRepositoryIntegrationTest {
         assertThat(foundFilm.get().getId()).isEqualTo(createdFilm.getId());
         assertThat(foundFilm.get().getName()).isEqualTo("Test Film");
         assertThat(foundFilm.get().getDescription()).isEqualTo("Test Description");
-        assertThat(foundFilm.get().getReleaseDate()).isEqualTo(LocalDate.of(2020,1,1));
+        assertThat(foundFilm.get().getReleaseDate()).isEqualTo(LocalDate.of(2020, 1, 1));
         assertThat(foundFilm.get().getDuration()).isEqualTo(120);
         assertThat(foundFilm.get().getMpa().getId()).isEqualTo(1L);
+        assertThat(foundFilm.get().getDirectors()).isEmpty();
     }
 
     @Test
@@ -93,6 +97,9 @@ public class JdbcFilmRepositoryIntegrationTest {
         assertThat(films).hasSize(2);
         assertThat(films).extracting(Film::getName)
                 .containsExactlyInAnyOrder("Test Film 1", "Test Film 2");
+        for (Film film : films) {
+            assertThat(film.getDirectors()).isNotNull();
+        }
     }
 
     @Test
@@ -104,6 +111,7 @@ public class JdbcFilmRepositoryIntegrationTest {
                 .duration(120)
                 .mpa(MpaRating.builder().id(1L).name("G").build())
                 .genres(new HashSet<>())
+                .directors(new HashSet<>())
                 .build();
         Film createdFilm = filmRepository.createFilm(film);
 
@@ -117,6 +125,7 @@ public class JdbcFilmRepositoryIntegrationTest {
                 .genres(new HashSet<>(Collections.singletonList(
                         Genre.builder().id(1L).name("Комедия").build()
                 )))
+                .directors(new HashSet<>())
                 .build();
 
         Film result = filmRepository.updateFilm(updatedFilm);
@@ -139,6 +148,7 @@ public class JdbcFilmRepositoryIntegrationTest {
                 .duration(120)
                 .mpa(MpaRating.builder().id(1L).name("G").build())
                 .genres(new HashSet<>())
+                .directors(new HashSet<>())
                 .build();
         Film createdFilm = filmRepository.createFilm(film);
 
@@ -165,6 +175,7 @@ public class JdbcFilmRepositoryIntegrationTest {
                 .duration(120)
                 .mpa(MpaRating.builder().id(1L).name("G").build())
                 .genres(new HashSet<>())
+                .directors(new HashSet<>())
                 .build();
 
         Film film2 = Film.builder()
@@ -174,6 +185,7 @@ public class JdbcFilmRepositoryIntegrationTest {
                 .duration(150)
                 .mpa(MpaRating.builder().id(2L).name("PG").build())
                 .genres(new HashSet<>())
+                .directors(new HashSet<>())
                 .build();
 
         filmRepository.createFilm(film1);
@@ -182,6 +194,9 @@ public class JdbcFilmRepositoryIntegrationTest {
         Collection<Film> popularFilms = filmRepository.getPopularFilms(2);
 
         assertThat(popularFilms).hasSize(2);
+        for (Film film : popularFilms) {
+            assertThat(film.getDirectors()).isNotNull();
+        }
         // Проверяем, что фильмы возвращаются (в данном случае без лайков,
         // порядок может быть произвольным)
     }
