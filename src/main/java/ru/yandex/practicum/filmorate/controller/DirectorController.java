@@ -19,32 +19,32 @@ public class DirectorController {
 
     //GET /directors
     @GetMapping
-    public Collection<Director> findAllDirectors(){
+    public Collection<Director> findAllDirectors() {
         return directorService.findAllDirectors();
     }
 
     //GET /directors/{id}
     @GetMapping("/{id}")
-    public  Director findDirectorById(@PathVariable Long id){
+    public Director findDirectorById(@PathVariable Long id) {
         return directorService.findDirectorById(id);
     }
 
     //POST /directors
     @PostMapping
-    public Director createDirector(@Valid @RequestBody Director director){
+    public Director createDirector(@Valid @RequestBody Director director) {
         return directorService.createDirector(director);
     }
 
 
     //PUT /directors
     @PutMapping
-    public Director updateDirector(@Valid @RequestBody Director newDirector){
+    public Director updateDirector(@Valid @RequestBody Director newDirector) {
         return directorService.updateDirector(newDirector);
     }
 
     // DELETE /directors/{id}
     @DeleteMapping("/{id}")
-    public void deleteDirector(@PathVariable Long id){
+    public void deleteDirector(@PathVariable Long id) {
         directorService.deleteDirector(id);
     }
 
