@@ -22,7 +22,7 @@ public class Film {
     @Size(max = 200, message = "Максимальная длина описания — 200 символов")
     private String description;
     @NotNull(message = "Дата релиза не может быть пустой")
-    @PastOrPresent(message = "Дата релиза не может быть в будущем")
+    //@PastOrPresent(message = "Дата релиза не может быть в будущем")
     @MinReleaseDate
     private LocalDate releaseDate;
     @Positive(message = "Продолжительность фильма должна быть положительным числом, в минутах")
