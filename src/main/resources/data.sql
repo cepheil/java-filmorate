@@ -53,15 +53,3 @@ MERGE INTO likes (film_id, user_id)
 VALUES
     (1, 1), (1, 2),
     (2, 1), (2, 3);
-
--- Отзывы
-MERGE INTO reviews (review_id, content, is_positive, user_id, film_id, rating)
-VALUES
-    (1, 'Это отличный фильм! Десяточка!', TRUE, 1, 1, 0),
-    (2, 'Отвратительный фильм! Не понравилось!', FALSE, 2, 1, 0);
-
--- Рейтинг отзывов
-MERGE INTO review_likes (review_id, user_id, is_like)
-VALUES
-    (1, 2, TRUE),
-    (1, 1, FALSE);

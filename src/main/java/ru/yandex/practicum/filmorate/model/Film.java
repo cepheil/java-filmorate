@@ -31,8 +31,11 @@ public class Film {
     private int duration;
     @NotNull(message = "Рейтинг MPA не может быть пустой")
     private MpaRating mpa;
+    @Builder.Default
     private Set<Long> likes = new HashSet<>();
+    @Builder.Default
     private Set<Genre> genres = new HashSet<>();
+    @Builder.Default
     private Set<Director> directors = new HashSet<>();
     private List<Review> reviews = new ArrayList<>();
 }

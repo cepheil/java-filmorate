@@ -135,7 +135,10 @@ public class ValidationService {
         if (review == null) {
             throw new ValidationException("Отзыв не может быть null");
         }
-        validateReviewExists(review.getUserId());
-        validateReviewExists(review.getFilmId());
+        if (review.getUseful() == null) {
+            review.setUseful(0);
+        }
+        validateUserExists(review.getUserId());
+        validateFilmExists(review.getFilmId());
     }
 }

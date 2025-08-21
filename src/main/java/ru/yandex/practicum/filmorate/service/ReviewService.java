@@ -27,6 +27,7 @@ public class ReviewService {
         log.info("Попытка обновить отзыв {}", review.getReviewId());
         validationService.validateReview(review);
         validationService.validateReviewExists(review.getReviewId());
+
         return reviewRepository.updateReview(review);
     }
 

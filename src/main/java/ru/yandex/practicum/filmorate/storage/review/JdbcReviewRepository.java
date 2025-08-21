@@ -13,8 +13,8 @@ import java.util.*;
 @Qualifier("reviewRepository")
 public class JdbcReviewRepository extends BaseNamedParameterRepository<Review> implements ReviewRepository {
     private static final String INSERT_REVIEW_QUERY = """
-            INSERT INTO reviews (content, is_positive, user_id, film_id, rating)
-            VALUES (:content, :isPositive, :userId, :filmId, rating)
+            INSERT INTO reviews (content, is_positive, user_id, film_id, useful)
+            VALUES (:content, :isPositive, :userId, :filmId, :useful)
             """;
 
     private static final String UPDATE_REVIEW_QUERY = """
@@ -30,26 +30,24 @@ public class JdbcReviewRepository extends BaseNamedParameterRepository<Review> i
     private static final String FIND_REVIEWS_BY_FILM_ID_QUERY = """
             SELECT * FROM reviews
             WHERE film_id = :filmId
-            ORDER BY rating DESC
+            ORDER BY useful DESC
             LIMIT :count
             """;
 
     private static final String FIND_ALL_REVIEWS_QUERY = """
             SELECT * FROM reviews
-            ORDER BY rating DESC
+            ORDER BY useful DESC
             LIMIT :count
             """;
 
     private static final String ADD_LIKE_QUERY = """
             INSERT INTO review_likes (review_id, user_id, is_like)
             VALUES (:reviewId, :userId, TRUE)
-            ON DUPLICATE KEY UPDATE is_like = TRUE
             """;
 
     private static final String ADD_DISLIKE_QUERY = """
             INSERT INTO review_likes (review_id, user_id, is_like)
             VALUES (:reviewId, :userId, FALSE)
-            ON DUPLICATE KEY UPDATE is_like = FALSE
             """;
 
     private static final String REMOVE_LIKE_QUERY = """
@@ -58,13 +56,13 @@ public class JdbcReviewRepository extends BaseNamedParameterRepository<Review> i
             """;
 
     private static final String REMOVE_DISLIKE_QUERY = """
-            DELETE FROM review_likes 
+            DELETE FROM review_likes
             WHERE review_id = :reviewId AND user_id = :userId AND is_like = FALSE
             """;
 
     private static final String UPDATE_RATING_QUERY = """
             UPDATE reviews
-            SET rating = rating + :delta
+            SET useful = useful + :delta
             WHERE review_id = :reviewId
             """;
 
@@ -79,7 +77,7 @@ public class JdbcReviewRepository extends BaseNamedParameterRepository<Review> i
         params.put("isPositive", review.getIsPositive());
         params.put("userId", review.getUserId());
         params.put("filmId", review.getFilmId());
-        params.put("rating", 0);
+        params.put("useful", 0);
 
         long id = insert(INSERT_REVIEW_QUERY, params);
         review.setReviewId(id);
@@ -118,6 +116,9 @@ public class JdbcReviewRepository extends BaseNamedParameterRepository<Review> i
         Map<String, Object> params = new HashMap<>();
         params.put("filmId", filmId);
         params.put("count", count);
+        if (filmId == null) {
+            return new ArrayList<>();
+        }
         return findMany(FIND_REVIEWS_BY_FILM_ID_QUERY, params);
     }
 

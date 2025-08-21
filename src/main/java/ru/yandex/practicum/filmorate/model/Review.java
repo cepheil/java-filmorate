@@ -20,6 +20,5 @@ public class Review {
     private Long userId;
     @NotNull(message = "Фильм обязателен.")
     private Long filmId;
-    private Integer rating;
-    private LocalDateTime createdAt;
+    private Integer useful;
 }
