@@ -9,12 +9,10 @@ import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.base.BaseNamedParameterRepository;
-import ru.yandex.practicum.filmorate.storage.genre.GenreRepository;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Repository
 @Qualifier("filmRepository")
@@ -173,6 +171,39 @@ public class JdbcFilmRepository extends BaseNamedParameterRepository<Film> imple
             ORDER BY like_count DESC
             LIMIT :count
             """;
+
+    private static final String GET_RECOMMENDED_FILMS_QUERY = """
+            SELECT f.film_id film_id,
+                   f.name name,
+                   f.description description,
+                   f.release_date  release_date,
+                   f.duration duration,
+                   r.mpa_id mpa_id,
+                   r.name mpa_name,
+                   r.description mpa_description
+            FROM likes l
+            LEFT JOIN films f ON l.film_id = f.film_id
+            LEFT JOIN mpa_ratings r ON r.MPA_ID = f.MPA_ID
+            WHERE l.user_id IN (
+                         SELECT USER_id
+                         FROM likes
+                         WHERE FILM_ID IN (
+                                           SELECT film_id
+                                           FROM likes
+                                           WHERE user_id = :userId
+                                          )
+                         AND user_id <> :userIdToo
+                         GROUP BY user_id
+                         ORDER BY count(film_id)
+                         LIMIT 1)
+            and l.film_id not in (
+                                  SELECT film_id
+                                  FROM likes
+                                  WHERE user_id = :userIdThree
+                                 )
+            ORDER BY f.film_id
+            """;
+
 
     public JdbcFilmRepository(NamedParameterJdbcOperations jdbc, RowMapper<Film> mapper) {
         super(jdbc, mapper);
@@ -354,6 +385,15 @@ public class JdbcFilmRepository extends BaseNamedParameterRepository<Film> imple
                     }
             );
         }
+    }
+
+    @Override
+    public Collection<Film> getRecommendedFilms(long userId) {
+        Map<String, Long> parameters = new HashMap<>();
+        parameters.put("userId", userId);
+        parameters.put("userIdToo", userId);
+        parameters.put("userIdThree", userId);
+        return findMany(GET_RECOMMENDED_FILMS_QUERY, parameters);
     }
 
 
