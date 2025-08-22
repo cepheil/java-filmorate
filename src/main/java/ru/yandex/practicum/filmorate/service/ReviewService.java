@@ -55,31 +55,31 @@ public class ReviewService {
         return reviewRepository.getAllReviews(count);
     }
 
-    public void addLike(Long reviewId, Long userId) {
+    public Review addLike(Long reviewId, Long userId) {
         log.info("Пользователь ID: {} Ставит лайк отзыву ID: {}", userId, reviewId);
         validationService.validateReviewExists(reviewId);
         validationService.validateUserExists(userId);
-        reviewRepository.addLike(reviewId, userId);
+        return reviewRepository.addLike(reviewId, userId);
     }
 
-    public void addDislike(Long reviewId, Long userId) {
+    public Review addDislike(Long reviewId, Long userId) {
         log.info("Пользователь ID: {} Ставит дизлайк отзыву ID: {}", userId, reviewId);
         validationService.validateReviewExists(reviewId);
         validationService.validateUserExists(userId);
-        reviewRepository.addDislike(reviewId, userId);
+        return reviewRepository.addDislike(reviewId, userId);
     }
 
-    public void removeLike(Long reviewId, Long userId) {
+    public Review removeLike(Long reviewId, Long userId) {
         log.info("Пользователь ID: {} удаляет лайк с отзыва ID: {}", userId, reviewId);
         validationService.validateReviewExists(reviewId);
         validationService.validateUserExists(userId);
-        reviewRepository.removeLike(reviewId, userId);
+        return reviewRepository.removeLike(reviewId, userId);
     }
 
-    public void removeDislike(Long reviewId, Long userId) {
+    public Review removeDislike(Long reviewId, Long userId) {
         log.info("Пользователь ID: {} удаляет дизлайк с отзыва ID: {}", userId, reviewId);
         validationService.validateReviewExists(reviewId);
         validationService.validateUserExists(userId);
-        reviewRepository.removeDislike(reviewId, userId);
+        return reviewRepository.removeDislike(reviewId, userId);
     }
 }

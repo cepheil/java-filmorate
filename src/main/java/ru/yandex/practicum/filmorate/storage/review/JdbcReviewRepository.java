@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.base.BaseNamedParameterRepository;
 
@@ -127,41 +128,49 @@ public class JdbcReviewRepository extends BaseNamedParameterRepository<Review> i
     }
 
     @Override
-    public void addLike(Long reviewId, Long userId) {
+    public Review addLike(Long reviewId, Long userId) {
         Map<String, Object> params = new HashMap<>();
         params.put("reviewId", reviewId);
         params.put("userId", userId);
         removeDislike(reviewId, userId);
         jdbc.update(ADD_LIKE_QUERY, params);
         updateRating(reviewId, 1);
+        return getReviewById(reviewId)
+                .orElseThrow(() -> new NotFoundException("Отзыв с ID " + reviewId + " не найден"));
     }
 
     @Override
-    public void addDislike(Long reviewId, Long userId) {
+    public Review addDislike(Long reviewId, Long userId) {
         Map<String, Object> params = new HashMap<>();
         params.put("reviewId", reviewId);
         params.put("userId", userId);
         removeLike(reviewId, userId);
         jdbc.update(ADD_DISLIKE_QUERY, params);
         updateRating(reviewId, -1);
+        return getReviewById(reviewId)
+                .orElseThrow(() -> new NotFoundException("Отзыв с ID " + reviewId + " не найден"));
     }
 
     @Override
-    public void removeLike(Long reviewId, Long userId) {
+    public Review removeLike(Long reviewId, Long userId) {
         Map<String, Object> params = new HashMap<>();
         params.put("reviewId", reviewId);
         params.put("userId", userId);
         jdbc.update(REMOVE_LIKE_QUERY, params);
         updateRating(reviewId, -1);
+        return getReviewById(reviewId)
+                .orElseThrow(() -> new NotFoundException("Отзыв с ID " + reviewId + " не найден"));
     }
 
     @Override
-    public void removeDislike(Long reviewId, Long userId) {
+    public Review removeDislike(Long reviewId, Long userId) {
         Map<String, Object> params = new HashMap<>();
         params.put("reviewId", reviewId);
         params.put("userId", userId);
         jdbc.update(REMOVE_DISLIKE_QUERY, params);
         updateRating(reviewId, 1);
+        return getReviewById(reviewId)
+                .orElseThrow(() -> new NotFoundException("Отзыв с ID " + reviewId + " не найден"));
     }
 
     private void updateRating(Long reviewId, int delta) {
