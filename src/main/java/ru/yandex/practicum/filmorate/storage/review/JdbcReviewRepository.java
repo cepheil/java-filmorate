@@ -116,9 +116,6 @@ public class JdbcReviewRepository extends BaseNamedParameterRepository<Review> i
         Map<String, Object> params = new HashMap<>();
         params.put("filmId", filmId);
         params.put("count", count);
-        if (filmId == null) {
-            return new ArrayList<>();
-        }
         return findMany(FIND_REVIEWS_BY_FILM_ID_QUERY, params);
     }
 
