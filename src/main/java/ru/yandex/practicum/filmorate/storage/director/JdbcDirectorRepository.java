@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.Director;
+package ru.yandex.practicum.filmorate.storage.director;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.RowMapper;
