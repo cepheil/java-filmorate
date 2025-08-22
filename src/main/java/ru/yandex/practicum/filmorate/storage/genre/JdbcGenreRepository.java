@@ -1,8 +1,10 @@
 package ru.yandex.practicum.filmorate.storage.genre;
 
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.base.BaseNamedParameterRepository;
 
@@ -20,7 +22,6 @@ public class JdbcGenreRepository extends BaseNamedParameterRepository<Genre> imp
             WHERE fg.film_id = :filmId
             ORDER BY g.genre_id
             """;
-    private static final String DELETE_FILM_GENRES_BY_FILM_ID = "DELETE FROM film_genre WHERE film_id = :filmId;";
 
     public JdbcGenreRepository(NamedParameterJdbcOperations jdbc, RowMapper<Genre> mapper) {
         super(jdbc, mapper);
@@ -47,10 +48,39 @@ public class JdbcGenreRepository extends BaseNamedParameterRepository<Genre> imp
     }
 
     @Override
-    public void deleteFilmGenresByFilmId(Long filmId) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("filmId", filmId);
-        jdbc.update(DELETE_FILM_GENRES_BY_FILM_ID, params);
+    public void loadGenresForFilms(Map<Long, Film> filmMap) {
+        if (filmMap.isEmpty()) {
+            return;
+        }
+
+        // SQL-запрос для загрузки жанров для всех фильмов
+        String sql = """
+            SELECT fg.film_id, g.genre_id, g.name
+            FROM film_genre fg
+            JOIN genres g ON fg.genre_id = g.genre_id
+            WHERE fg.film_id IN (:filmIds)
+            """;
+
+        // Подготовка параметров запроса
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("filmIds", filmMap.keySet());
+
+        // Выполнение запроса и обработка результатов
+        jdbc.query(sql, parameters, rs -> {
+            Long filmId = rs.getLong("film_id");
+            Film film = filmMap.get(filmId);
+
+            // Если у фильма еще нет жанров, инициализируем пустое множество
+            if (film.getGenres() == null) {
+                film.setGenres(new HashSet<>());
+            }
+
+            // Добавляем жанр в фильм
+            film.getGenres().add(new Genre(
+                    rs.getLong("genre_id"),
+                    rs.getString("name")
+            ));
+        });
     }
 }
 

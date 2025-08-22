@@ -105,7 +105,7 @@ public class JdbcFilmRepository extends BaseNamedParameterRepository<Film> imple
     private static final String SEARCH_FILMS_BY_DIRECTOR_QUERY = """
             SELECT f.*, m.mpa_id AS mpa_id, m.name AS mpa_name, m.description AS mpa_description
             FROM films f
-            JOIN map_ratings m ON f.mpa_id = m.mpa_id
+            JOIN mpa_ratings m ON f.mpa_id = m.mpa_id
             JOIN film_directors fd ON f.film_id = fd.film_id
             JOIN directors d ON fd.director_id = d.director_id
             WHERE LOWER(d.name) LIKE LOWER(CONCAT('%', :query, '%'))

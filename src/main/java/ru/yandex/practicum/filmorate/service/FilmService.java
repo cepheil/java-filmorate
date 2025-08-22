@@ -135,15 +135,18 @@ public class FilmService {
         log.info("Поиск фильмов с query: {} и by: {}", query, by);
         validationService.validateSearchQuery(query);
         Set<String> searchBy = validationService.validateAndParseSearchBy(by);
+        Collection<Film> films;
         if (searchBy.contains("title") && searchBy.contains("director")) {
-            return filmRepository.searchFilmsByTitleAndDirector(query);
+            films = filmRepository.searchFilmsByTitleAndDirector(query);
         } else if (searchBy.contains("title")) {
-            return filmRepository.searchFilmsByTitle(query);
+            films = filmRepository.searchFilmsByTitle(query);
         } else if (searchBy.contains("director")) {
-            return filmRepository.searchFilmsByDirector(query);
+            films = filmRepository.searchFilmsByDirector(query);
         } else {
             throw new ValidationException("Неверный параметр 'by'. Используйте 'title', 'director' или оба.");
         }
+        loadAdditionalData(new ArrayList<>(films));
+        return films;
     }
 
 
@@ -156,7 +159,7 @@ public class FilmService {
                 .stream()
                 .collect(Collectors.toMap(Film::getId, f -> f)); // формируем мапу
         //Заглушки для аналогичных методов по добавлению жанров и лайков.
-        //genreRepository.loadGenresForFilms(filmMap);
+        genreRepository.loadGenresForFilms(filmMap);
         //likeRepository.loadLikesForFilms(filmMap);
         directorRepository.loadDirectorsForFilms(filmMap);
     }
