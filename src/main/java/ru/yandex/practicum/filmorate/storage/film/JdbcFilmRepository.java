@@ -94,6 +94,35 @@ public class JdbcFilmRepository extends BaseNamedParameterRepository<Film> imple
     private static final String INSERT_FILM_DIRECTORS_QUERY = """
             INSERT INTO film_directors(film_id, director_id) VALUES(?, ?)""";
 
+    private static final String SEARCH_FILMS_BY_TITLE_QUERY = """
+            SELECT f.*, m.mpa_id AS mpa_id, m.name AS mpa_name, m.description AS mpa_description
+            FROM films f
+            JOIN mpa_ratings m ON f.mpa_id = m.mpa_id
+            WHERE LOWER(f.name) LIKE LOWER(CONCAT('%', :query, '%'))
+            ORDER BY f.film_id
+            """;
+
+    private static final String SEARCH_FILMS_BY_DIRECTOR_QUERY = """
+            SELECT f.*, m.mpa_id AS mpa_id, m.name AS mpa_name, m.description AS mpa_description
+            FROM films f
+            JOIN map_ratings m ON f.mpa_id = m.mpa_id
+            JOIN film_directors fd ON f.film_id = fd.film_id
+            JOIN directors d ON fd.director_id = d.director_id
+            WHERE LOWER(d.name) LIKE LOWER(CONCAT('%', :query, '%'))
+            ORDER BY f.film_id
+            """;
+
+    private static final String SEARCH_FILMS_BY_TITLE_AND_DIRECTOR_QUERY = """
+            SELECT DISTINCT f.*, m.mpa_id AS mpa_id, m.name AS mpa_name, m.description AS mpa_description
+            FROM films f
+            JOIN mpa_ratings m ON f.mpa_id = m.mpa_id
+            LEFT JOIN film_directors fd ON f.film_id = fd.film_id
+            LEFT JOIN directors d ON fd.director_id = d.director_id
+            WHERE LOWER(f.name) LIKE LOWER(CONCAT('%', :query, '%'))
+               OR LOWER(d.name) LIKE LOWER(CONCAT('%', :query, '%'))
+            ORDER BY f.film_id
+            """;
+
 
     private static final String GET_POPULAR_FILMS_BY_GENRE_AND_YEAR_QUERY = """
             SELECT  f.*,
@@ -261,6 +290,26 @@ public class JdbcFilmRepository extends BaseNamedParameterRepository<Film> imple
         return findMany(FIND_FILMS_BY_DIRECTOR_BY_LIKES_QUERY, params);
     }
 
+    @Override
+    public Collection<Film> searchFilmsByTitle(String query) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("query", query);
+        return findMany(SEARCH_FILMS_BY_TITLE_QUERY, params);
+    }
+
+    @Override
+    public Collection<Film> searchFilmsByDirector(String query) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("query", query);
+        return findMany(SEARCH_FILMS_BY_DIRECTOR_QUERY, params);
+    }
+
+    @Override
+    public Collection<Film> searchFilmsByTitleAndDirector(String query) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("query", query);
+        return findMany(SEARCH_FILMS_BY_TITLE_AND_DIRECTOR_QUERY, params);
+    }
 
     public void updateGenres(Set<Genre> genres, Long filmId) {
         if (!genres.isEmpty()) {

@@ -11,6 +11,10 @@ import ru.yandex.practicum.filmorate.storage.user.UserRepository;
 import ru.yandex.practicum.filmorate.storage.genre.GenreRepository;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaRepository;
 
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class ValidationService {
@@ -96,5 +100,23 @@ public class ValidationService {
                 .orElseThrow(() -> new NotFoundException("Режиссер с ID " + directorId + " не найден"));
     }
 
+    public void validateSearchQuery(String query) {
+        if (query == null || query.isEmpty()) {
+            throw new ValidationException("Текст для поиска не может быть пустым.");
+        }
+    }
 
+    public Set<String> validateAndParseSearchBy(String by) {
+        if (by == null || by.isEmpty()) {
+            throw new ValidationException("Текст для поиска не может быть пустым.");
+        }
+        Set<String> validOptions = Set.of("title", "director");
+        Set<String> searchBy = Arrays.stream(by.split(","))
+                .map(String::trim)
+                .collect(Collectors.toSet());
+        if (!validOptions.containsAll(searchBy)) {
+            throw new ValidationException("Неверный параметр. Используйте 'title', 'director' или оба.");
+        }
+        return searchBy;
+    }
 }

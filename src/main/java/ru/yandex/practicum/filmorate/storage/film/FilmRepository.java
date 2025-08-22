@@ -28,4 +28,10 @@ public interface FilmRepository {
     Collection<Film> findFilmsByDirectorSortedByYear(Long directorId);
 
     Collection<Film> findFilmsByDirectorSortedByLikes(Long directorId);
+
+    Collection<Film> searchFilmsByTitle(String query);
+
+    Collection<Film> searchFilmsByDirector(String query);
+
+    Collection<Film> searchFilmsByTitleAndDirector(String query);
 }

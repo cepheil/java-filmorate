@@ -10,10 +10,7 @@ import ru.yandex.practicum.filmorate.storage.Director.DirectorRepository;
 import ru.yandex.practicum.filmorate.storage.film.FilmRepository;
 import ru.yandex.practicum.filmorate.storage.genre.GenreRepository;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -132,6 +129,21 @@ public class FilmService {
         loadAdditionalData(films);
         log.info("по запросу GET /films/director/{} получена коллекция из {} фильмов", directorId, films.size());
         return films;
+    }
+
+    public Collection<Film> searchFilms(String query, String by) {
+        log.info("Поиск фильмов с query: {} и by: {}", query, by);
+        validationService.validateSearchQuery(query);
+        Set<String> searchBy = validationService.validateAndParseSearchBy(by);
+        if (searchBy.contains("title") && searchBy.contains("director")) {
+            return filmRepository.searchFilmsByTitleAndDirector(query);
+        } else if (searchBy.contains("title")) {
+            return filmRepository.searchFilmsByTitle(query);
+        } else if (searchBy.contains("director")) {
+            return filmRepository.searchFilmsByDirector(query);
+        } else {
+            throw new ValidationException("Неверный параметр 'by'. Используйте 'title', 'director' или оба.");
+        }
     }
 
 
