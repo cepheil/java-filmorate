@@ -174,29 +174,20 @@ public class JdbcFilmRepository extends BaseNamedParameterRepository<Film> imple
             LIMIT :count
             """;
 
-
-    private final GenreRepository genreRepository;
-
-    public JdbcFilmRepository(NamedParameterJdbcOperations jdbc, RowMapper<Film> mapper, GenreRepository genreRepository) {
+    public JdbcFilmRepository(NamedParameterJdbcOperations jdbc, RowMapper<Film> mapper) {
         super(jdbc, mapper);
-        this.genreRepository = genreRepository;
     }
 
     @Override
     public List<Film> findAllFilms() {
-        return findMany(FIND_ALL_FILMS_QUERY, new HashMap<>()).stream().peek(film -> {
-            film.setGenres(genreRepository.findGenreByFilmId(film.getId()));
-        }).collect(Collectors.toList());
+        return findMany(FIND_ALL_FILMS_QUERY, new HashMap<>());
     }
 
     @Override
     public Optional<Film> getFilmById(Long filmId) {
         Map<String, Object> params = new HashMap<>();
         params.put("filmId", filmId);
-        return findOne(FIND_FILM_BY_ID_QUERY, params).map(film -> {
-            film.setGenres(genreRepository.findGenreByFilmId(filmId));
-            return film;
-        });
+        return findOne(FIND_FILM_BY_ID_QUERY, params);
     }
 
     @Override
