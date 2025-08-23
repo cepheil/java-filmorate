@@ -17,4 +17,6 @@ public interface GenreRepository {
     Set<Genre> findGenreByFilmId(Long filmId);
 
     void loadGenresForFilms(Map<Long, Film> filmMap);
+
+    void deleteFilmGenresByFilmId(Long filmId);
 }
