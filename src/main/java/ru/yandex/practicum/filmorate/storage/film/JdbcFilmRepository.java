@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
@@ -9,14 +10,19 @@ import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.base.BaseNamedParameterRepository;
+import ru.yandex.practicum.filmorate.storage.genre.GenreRepository;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 @Qualifier("filmRepository")
 public class JdbcFilmRepository extends BaseNamedParameterRepository<Film> implements FilmRepository {
+    @Autowired
+    private GenreRepository genreRepository;
+
     private static final String FIND_ALL_FILMS_QUERY = """
             SELECT f.*, m.mpa_id AS mpa_id, m.name AS mpa_name, m.description AS mpa_description
             FROM films f
@@ -204,6 +210,25 @@ public class JdbcFilmRepository extends BaseNamedParameterRepository<Film> imple
             ORDER BY f.film_id
             """;
 
+    private static final String GET_COMMON_FILMS_QUERY = """
+            select f.film_id film_id,
+                   f.name name,
+                   f.description description,
+                   f.release_date  release_date,
+                   f.duration duration,
+                   r.mpa_id mpa_id,
+                   r.name mpa_name,
+                   r.description mpa_description
+            from films f
+            JOIN likes l ON f.film_id = l.film_id
+            JOIN mpa_ratings r ON f.mpa_id = r.mpa_id
+            WHERE f.film_id IN (SELECT ul.film_id
+                               FROM likes ul
+                               JOIN likes fl ON ul.film_id = fl.film_id
+                               WHERE ul.USER_id = :userId AND fl.user_id = :friendId)
+            GROUP BY f.film_id
+            ORDER BY COUNT(l.film_id) DESC
+            """;
 
     public JdbcFilmRepository(NamedParameterJdbcOperations jdbc, RowMapper<Film> mapper) {
         super(jdbc, mapper);
@@ -396,5 +421,15 @@ public class JdbcFilmRepository extends BaseNamedParameterRepository<Film> imple
         return findMany(GET_RECOMMENDED_FILMS_QUERY, parameters);
     }
 
+    @Override
+    public Collection<Film> getCommonFilms(long userId, long friendId) {
+        Map<String, Long> parameters = new HashMap<>();
+        parameters.put("userId", userId);
+        parameters.put("friendId", friendId);
+        return findMany(GET_COMMON_FILMS_QUERY, parameters)
+                .stream()
+                .peek(film -> film.setGenres(genreRepository.findGenreByFilmId(film.getId())))
+                .collect(Collectors.toList());
+    }
 
 }

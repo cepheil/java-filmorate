@@ -36,4 +36,6 @@ public interface FilmRepository {
     Collection<Film> searchFilmsByTitleAndDirector(String query);
 
     Collection<Film> getRecommendedFilms(long userId);
+
+    Collection<Film> getCommonFilms(long userId, long friendId);
 }

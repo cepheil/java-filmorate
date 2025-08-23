@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.director.DirectorRepository;
 import ru.yandex.practicum.filmorate.storage.film.FilmRepository;
 import ru.yandex.practicum.filmorate.storage.genre.GenreRepository;
@@ -22,6 +23,7 @@ public class FilmService {
     private final LikeService likeService;
     private final DirectorRepository directorRepository;
     private final GenreRepository genreRepository;
+    private final UserService userService;
 
     public Collection<Film> findAllFilms() {
         log.info("Попытка получения всех фильмов");
@@ -89,7 +91,7 @@ public class FilmService {
         loadAdditionalData(popularFilms);
 
         log.info("по запросу GET /films/popular?count={}&genreId={}&year={} " +
-                 "получена коллекция из {} популярных фильмов",
+                        "получена коллекция из {} популярных фильмов",
                 count, genreId, year, popularFilms.size());
 
         return popularFilms;
@@ -164,5 +166,12 @@ public class FilmService {
         directorRepository.loadDirectorsForFilms(filmMap);
     }
 
+    public Collection<Film> getCommonFilms(long userId, long friendId) {
+        User friend = userService.getUserById(friendId);
+        Collection<Film> filmList = filmRepository.getCommonFilms(userId, friendId);
+        log.info("Отгрузил {} общих фильмов для пользователей {} и {}", filmList.size(),
+                userId, friendId);
+        return filmList;
+    }
 
 }
