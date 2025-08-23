@@ -76,4 +76,9 @@ public class FilmController {
                                            @RequestParam("friendId") Long friendId) {
         return filmService.getCommonFilms(userId, friendId);
     }
+    
+    @DeleteMapping("/{filmId}")
+    public void removeFilm(@PathVariable Long filmId) {
+        filmService.removeFilm(filmId);
+    }
 }
