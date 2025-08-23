@@ -29,4 +29,20 @@ public class JdbcLikeRepository implements LikeRepository {
         params.put("userId", userId);
         jdbc.update(sql, params);
     }
+
+    @Override
+    public void deleteLikesByFilmId(Long filmId) {
+        String sql = "DELETE FROM likes WHERE film_id = :filmId;";
+        Map<String, Object> params = new HashMap<>();
+        params.put("filmId", filmId);
+        jdbc.update(sql, params);
+    }
+
+    @Override
+    public void deleteLikesByUserId(Long userId) {
+        String sql = "DELETE FROM likes WHERE user_id = :userId;";
+        Map<String, Object> params = new HashMap<>();
+        params.put("userId", userId);
+        jdbc.update(sql, params);
+    }
 }

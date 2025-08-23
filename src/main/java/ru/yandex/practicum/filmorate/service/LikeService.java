@@ -16,4 +16,12 @@ public class LikeService {
     public void removeLike(Long filmId, Long userId) {
         likeRepository.removeLike(filmId, userId);
     }
+
+    public void removeLikesByFilmId(Long filmId) {
+        likeRepository.deleteLikesByFilmId(filmId);
+    }
+
+    public void removeLikesByUserId(Long userId) {
+        likeRepository.deleteLikesByUserId(userId);
+    }
 }

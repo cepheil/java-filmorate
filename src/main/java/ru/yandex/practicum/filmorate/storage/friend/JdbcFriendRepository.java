@@ -59,6 +59,8 @@ public class JdbcFriendRepository implements FriendRepository {
             WHERE user_id = :userId AND friend_id = :friendId AND confirmed = :confirmed
             """;
 
+    private static final String DELETE_ALL_FRIENDS_BY_USER_ID = "DELETE FROM friends WHERE user_id = :userId OR friend_id = :userId;";
+
     @Override
     public void addFriend(Long userId, Long friendId) {
         boolean hasReverseRequest = checkFriendshipStatus(userId, friendId, false);
@@ -108,6 +110,13 @@ public class JdbcFriendRepository implements FriendRepository {
     @Override
     public boolean hasFriendship(Long userId, Long friendId) {
         return checkFriendshipStatus(userId, friendId, true);
+    }
+
+    @Override
+    public void deleteAllFriendsByUserId(Long userId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("userId", userId);
+        jdbc.update(DELETE_ALL_FRIENDS_BY_USER_ID, params);
     }
 
     private boolean checkFriendshipStatus(Long userId, Long friendId, boolean confirmed) {

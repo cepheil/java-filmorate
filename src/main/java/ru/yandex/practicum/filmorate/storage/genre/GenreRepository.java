@@ -13,4 +13,6 @@ public interface GenreRepository {
     List<Genre> findAllGenres();
 
     Set<Genre> findGenreByFilmId(Long filmId);
+
+    void deleteFilmGenresByFilmId(Long filmId);
 }

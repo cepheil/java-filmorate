@@ -5,4 +5,8 @@ public interface LikeRepository {
     void addLike(Long filmId, Long userId);
 
     void removeLike(Long filmId, Long userId);
+
+    void deleteLikesByFilmId(Long filmId);
+
+    void deleteLikesByUserId(Long userId);
 }

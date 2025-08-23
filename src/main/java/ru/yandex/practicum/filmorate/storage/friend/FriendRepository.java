@@ -15,4 +15,6 @@ public interface FriendRepository {
     List<User> getCommonFriends(Long userId1, Long userId2);
 
     boolean hasFriendship(Long userId, Long friendId);
+
+    void deleteAllFriendsByUserId(Long userId);
 }

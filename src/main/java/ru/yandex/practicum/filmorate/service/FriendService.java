@@ -44,4 +44,9 @@ public class FriendService {
         validationService.validateUsersExist(userId1, userId2);
         return friendRepository.getCommonFriends(userId1, userId2);
     }
+
+    public void removeAllFriendsByUserId(Long userId) {
+        log.info("Удаление всех записей о друзьях пользоватея {} ", userId);
+        friendRepository.deleteAllFriendsByUserId(userId);
+    }
 }

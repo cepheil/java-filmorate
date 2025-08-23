@@ -20,6 +20,7 @@ public class JdbcGenreRepository extends BaseNamedParameterRepository<Genre> imp
             WHERE fg.film_id = :filmId
             ORDER BY g.genre_id
             """;
+    private static final String DELETE_FILM_GENRES_BY_FILM_ID = "DELETE FROM film_genre WHERE film_id = :filmId;";
 
     public JdbcGenreRepository(NamedParameterJdbcOperations jdbc, RowMapper<Genre> mapper) {
         super(jdbc, mapper);
@@ -45,5 +46,11 @@ public class JdbcGenreRepository extends BaseNamedParameterRepository<Genre> imp
                 .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparingLong(Genre::getId))));
     }
 
+    @Override
+    public void deleteFilmGenresByFilmId(Long filmId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("filmId", filmId);
+        jdbc.update(DELETE_FILM_GENRES_BY_FILM_ID, params);
+    }
 }
 
