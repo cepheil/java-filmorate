@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.base.BaseNamedParameterRepository;
-import ru.yandex.practicum.filmorate.storage.genre.GenreRepository;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -112,8 +111,6 @@ public class JdbcFilmRepository extends BaseNamedParameterRepository<Film> imple
             ORDER BY f.film_id
             """;
 
-    public JdbcFilmRepository(NamedParameterJdbcOperations jdbc, RowMapper<Film> mapper,
-                              GenreRepository genreRepository) {
     private static final String SEARCH_FILMS_BY_TITLE_AND_DIRECTOR_QUERY = """
             SELECT DISTINCT f.*, m.mpa_id AS mpa_id, m.name AS mpa_name, m.description AS mpa_description
             FROM films f
@@ -228,7 +225,6 @@ public class JdbcFilmRepository extends BaseNamedParameterRepository<Film> imple
             ORDER BY COUNT(l.film_id) DESC
             """;
 
-    public JdbcFilmRepository(NamedParameterJdbcOperations jdbc, RowMapper<Film> mapper) {
     public JdbcFilmRepository(NamedParameterJdbcOperations jdbc, RowMapper<Film> mapper) {
         super(jdbc, mapper);
     }
@@ -425,10 +421,8 @@ public class JdbcFilmRepository extends BaseNamedParameterRepository<Film> imple
         Map<String, Long> parameters = new HashMap<>();
         parameters.put("userId", userId);
         parameters.put("friendId", friendId);
-        return findMany(GET_COMMON_FILMS_QUERY, parameters)
-                .stream()
-                .peek(film -> film.setGenres(genreRepository.findGenreByFilmId(film.getId())))
-                .collect(Collectors.toList());
-    }
 
+        List<Film> films = findMany(GET_COMMON_FILMS_QUERY, parameters);
+        return films;
+    }
 }

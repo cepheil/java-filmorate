@@ -13,7 +13,6 @@ import ru.yandex.practicum.filmorate.storage.director.DirectorRepository;
 import ru.yandex.practicum.filmorate.storage.film.FilmRepository;
 import ru.yandex.practicum.filmorate.storage.genre.GenreRepository;
 import ru.yandex.practicum.filmorate.storage.review.ReviewRepository;
-import ru.yandex.practicum.filmorate.storage.genre.GenreRepository;
 
 import java.util.Collection;
 import java.util.List;
@@ -31,6 +30,7 @@ public class FilmService {
     private final DirectorRepository directorRepository;
     private final GenreRepository genreRepository;
     private final UserService userService;
+    private final ReviewRepository reviewRepository;
 
     public Collection<Film> findAllFilms() {
         log.info("Попытка получения всех фильмов");
@@ -41,8 +41,6 @@ public class FilmService {
             List<Review> reviews = reviewRepository.getReviewsByFilmId(film.getId(), Integer.MAX_VALUE);
             film.setReviews(reviews);
         }
-        return films;
-
         List<Film> allFilms = new ArrayList<>(filmRepository.findAllFilms());
         if (allFilms.isEmpty()) {
             log.info("GET /films. Получена пустая коллекция");
@@ -62,7 +60,6 @@ public class FilmService {
         film.setGenres(genres);
         List<Review> reviews = reviewRepository.getReviewsByFilmId(filmId, Integer.MAX_VALUE);
         film.setReviews(reviews);
-        return film;
         loadAdditionalData(List.of(film));
         log.info("GET /films/{filmId} - получен  фильм ID={}, name={}", filmId, film.getName());
         return film;
@@ -189,6 +186,7 @@ public class FilmService {
     public Collection<Film> getCommonFilms(long userId, long friendId) {
         User friend = userService.getUserById(friendId);
         Collection<Film> filmList = filmRepository.getCommonFilms(userId, friendId);
+        loadAdditionalData(new ArrayList<>(filmList));
         log.info("Отгрузил {} общих фильмов для пользователей {} и {}", filmList.size(),
                 userId, friendId);
         return filmList;

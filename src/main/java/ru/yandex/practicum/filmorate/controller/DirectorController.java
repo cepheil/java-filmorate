@@ -35,7 +35,6 @@ public class DirectorController {
         return directorService.createDirector(director);
     }
 
-
     //PUT /directors
     @PutMapping
     public Director updateDirector(@Valid @RequestBody Director newDirector) {
