@@ -13,7 +13,6 @@ import ru.yandex.practicum.filmorate.storage.base.BaseNamedParameterRepository;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Repository
 @Qualifier("filmRepository")
