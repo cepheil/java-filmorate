@@ -19,24 +19,30 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final ValidationService validationService;
     private final ReviewLikesRepository reviewLikesRepository;
+    private final EventService eventService;
 
     public Review createReview(Review review) {
         log.info("Попытка создания отзыва для фильма ID: {}, пользователем ID: {}",
                 review.getFilmId(), review.getUserId());
         validationService.validateReview(review);
-        return reviewRepository.createReview(review);
+        Review newReview = reviewRepository.createReview(review);
+        eventService.addEvent(review.getUserId(), newReview.getReviewId(), "REVIEW", "ADD");
+        return newReview;
     }
 
     public Review updateReview(Review review) {
         log.info("Попытка обновить отзыв {}", review.getReviewId());
         validationService.validateReview(review);
         validationService.validateReviewExists(review.getReviewId());
+        eventService.addEvent(review.getUserId(), review.getReviewId(), "REVIEW", "UPDATE");
         return reviewRepository.updateReview(review);
     }
 
     public void deleteReview(Long reviewId) {
         log.info("Попытка удаления отзыва с ID: {}", reviewId);
         validationService.validateReviewExists(reviewId);
+        Review review = reviewRepository.getReviewById(reviewId).get();
+        eventService.addEvent(review.getUserId(), reviewId, "REVIEW", "REMOVE");
         reviewRepository.deleteReview(reviewId);
     }
 

@@ -15,6 +15,7 @@ import java.util.Collection;
 public class FriendService {
     private final FriendRepository friendRepository;
     private final ValidationService validationService;
+    private final EventService eventService;
 
     public void addFriend(Long userId, Long friendId) {
         log.info("Попытка добавления друзья: пользователь {} добавляет {}", userId, friendId);
@@ -23,6 +24,7 @@ public class FriendService {
             throw new ValidationException("Пользователь не может добавить себя в друзья.");
         }
         friendRepository.addFriend(userId, friendId);
+        eventService.addEvent(userId, friendId, "FRIEND", "ADD");
         log.info("Пользователь {} отправил запрос на дружбу пользователю {}", userId, friendId);
     }
 
@@ -30,6 +32,7 @@ public class FriendService {
         log.info("Пользователь {} удалил пользователя {} из друзей", userId, friendId);
         validationService.validateUsersExist(userId, friendId);
         friendRepository.removeFriend(userId, friendId);
+        eventService.addEvent(userId, friendId, "FRIEND", "REMOVE");
         log.info("Пользователь {} удалил пользователя {} из друзей", userId, friendId);
     }
 
