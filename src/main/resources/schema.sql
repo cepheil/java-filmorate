@@ -79,11 +79,10 @@ CREATE TABLE IF NOT EXISTS reviews (
     useful INT NOT NULL DEFAULT 0
 );
 
--- Рейтинг отзывов
+
 CREATE TABLE IF NOT EXISTS review_likes (
     review_id BIGINT REFERENCES reviews (review_id) ON DELETE CASCADE,
     user_id BIGINT REFERENCES users (user_id) ON DELETE CASCADE,
-    is_like BOOLEAN NOT NULL,
-    PRIMARY KEY (review_id, user_id),
-    UNIQUE (review_id, user_id)
+    is_like boolean default true,
+    primary key (review_id, user_id)
 );

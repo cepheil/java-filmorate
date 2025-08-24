@@ -31,43 +31,38 @@ public class ReviewController {
         reviewService.deleteReview(id);
     }
 
-    @GetMapping
-    public List<Review> getAllReviews(@RequestParam(defaultValue = "10") int count) {
-        return reviewService.getAllReviews(count);
-    }
-
     @GetMapping("/{id}")
     public Review getReviewById(@PathVariable Long id) {
         return reviewService.getReviewById(id);
     }
 
-    @GetMapping("/film/{filmId}")
-    public List<Review> getReviewsByFilmId(@PathVariable Long filmId,
+    @GetMapping
+    public List<Review> getReviewsByFilmId(@RequestParam Long filmId,
                                            @RequestParam(defaultValue = "10") int count) {
         return reviewService.getReviewsByFilmId(filmId, count);
     }
 
     @PutMapping("/{reviewId}/like/{userId}")
-    public Review addLike(@PathVariable Long reviewId,
+    public void addLike(@PathVariable Long reviewId,
                         @PathVariable Long userId) {
-        return reviewService.addLike(reviewId, userId);
+        reviewService.addLike(reviewId, userId);
     }
 
     @PutMapping("/{reviewId}/dislike/{userId}")
-    public Review addDislike(@PathVariable Long reviewId,
+    public void addDislike(@PathVariable Long reviewId,
                            @PathVariable Long userId) {
-        return reviewService.addDislike(reviewId, userId);
+        reviewService.addDislike(reviewId, userId);
     }
 
     @DeleteMapping("/{reviewId}/like/{userId}")
-    public Review removeLike(@PathVariable Long reviewId,
+    public void removeLike(@PathVariable Long reviewId,
                            @PathVariable Long userId) {
-        return reviewService.removeLike(reviewId, userId);
+        reviewService.deleteLike(reviewId, userId);
     }
 
     @DeleteMapping("/{reviewId}/dislike/{userId}")
-    public Review removeDislike(@PathVariable Long reviewId,
+    public void removeDislike(@PathVariable Long reviewId,
                               @PathVariable Long userId) {
-        return reviewService.removeDislike(reviewId, userId);
+        reviewService.deleteDislike(reviewId, userId);
     }
 }

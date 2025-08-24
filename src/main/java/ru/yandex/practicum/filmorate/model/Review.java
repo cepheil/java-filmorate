@@ -3,11 +3,9 @@ package ru.yandex.practicum.filmorate.model;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @Data
 @Builder(toBuilder = true)
-@NoArgsConstructor
+@RequiredArgsConstructor
 @AllArgsConstructor
 public class Review {
     private Long reviewId;

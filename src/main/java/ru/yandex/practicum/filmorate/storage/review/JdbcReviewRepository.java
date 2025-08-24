@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.base.BaseNamedParameterRepository;
 
@@ -20,7 +19,7 @@ public class JdbcReviewRepository extends BaseNamedParameterRepository<Review> i
 
     private static final String UPDATE_REVIEW_QUERY = """
             UPDATE reviews
-            SET content = :content, is_positive = :isPositive, user_id = :userId, film_id = :filmId
+            SET content = :content, is_positive = :isPositive, user_id = :userId, film_id = :filmId, useful = :useful
             WHERE review_id = :reviewId;
             """;
 
@@ -41,29 +40,15 @@ public class JdbcReviewRepository extends BaseNamedParameterRepository<Review> i
             LIMIT :count
             """;
 
-    private static final String ADD_LIKE_QUERY = """
-            INSERT INTO review_likes (review_id, user_id, is_like)
-            VALUES (:reviewId, :userId, TRUE)
-            """;
-
-    private static final String ADD_DISLIKE_QUERY = """
-            INSERT INTO review_likes (review_id, user_id, is_like)
-            VALUES (:reviewId, :userId, FALSE)
-            """;
-
-    private static final String REMOVE_LIKE_QUERY = """
-            DELETE FROM review_likes
-            WHERE review_id = :reviewId AND user_id = :userId AND is_like = TRUE
-            """;
-
-    private static final String REMOVE_DISLIKE_QUERY = """
-            DELETE FROM review_likes
-            WHERE review_id = :reviewId AND user_id = :userId AND is_like = FALSE
-            """;
-
-    private static final String UPDATE_RATING_QUERY = """
+    private static final String UPDATE_REVIEW_LIKE_QUERY = """
             UPDATE reviews
-            SET useful = useful + :delta
+            SET useful = useful + 1
+            WHERE review_id = :reviewId
+            """;
+
+    private static final String UPDATE_REVIEW_DISLIKE_QUERY = """
+            UPDATE reviews
+            SET useful = useful - 1
             WHERE review_id = :reviewId
             """;
 
@@ -88,11 +73,12 @@ public class JdbcReviewRepository extends BaseNamedParameterRepository<Review> i
     @Override
     public Review updateReview(Review review) {
         Map<String, Object> params = new HashMap<>();
+        params.put("reviewId", review.getReviewId());
         params.put("content", review.getContent());
         params.put("isPositive", review.getIsPositive());
         params.put("userId", review.getUserId());
         params.put("filmId", review.getFilmId());
-        params.put("reviewId", review.getReviewId());
+        params.put("useful", review.getUseful());
 
         update(UPDATE_REVIEW_QUERY, params);
         return review;
@@ -121,62 +107,18 @@ public class JdbcReviewRepository extends BaseNamedParameterRepository<Review> i
     }
 
     @Override
-    public List<Review> getAllReviews(int count) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("count", count);
-        return findMany(FIND_ALL_REVIEWS_QUERY, params);
-    }
-
-    @Override
-    public Review addLike(Long reviewId, Long userId) {
+    public void addLike(Long reviewId, Long userId) {
         Map<String, Object> params = new HashMap<>();
         params.put("reviewId", reviewId);
         params.put("userId", userId);
-        removeDislike(reviewId, userId);
-        jdbc.update(ADD_LIKE_QUERY, params);
-        updateRating(reviewId, 1);
-        return getReviewById(reviewId)
-                .orElseThrow(() -> new NotFoundException("Отзыв с ID " + reviewId + " не найден"));
+        update(UPDATE_REVIEW_LIKE_QUERY, params);
     }
 
     @Override
-    public Review addDislike(Long reviewId, Long userId) {
+    public void addDislike(Long reviewId, Long userId) {
         Map<String, Object> params = new HashMap<>();
         params.put("reviewId", reviewId);
         params.put("userId", userId);
-        removeLike(reviewId, userId);
-        jdbc.update(ADD_DISLIKE_QUERY, params);
-        updateRating(reviewId, -1);
-        return getReviewById(reviewId)
-                .orElseThrow(() -> new NotFoundException("Отзыв с ID " + reviewId + " не найден"));
-    }
-
-    @Override
-    public Review removeLike(Long reviewId, Long userId) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("reviewId", reviewId);
-        params.put("userId", userId);
-        jdbc.update(REMOVE_LIKE_QUERY, params);
-        updateRating(reviewId, -1);
-        return getReviewById(reviewId)
-                .orElseThrow(() -> new NotFoundException("Отзыв с ID " + reviewId + " не найден"));
-    }
-
-    @Override
-    public Review removeDislike(Long reviewId, Long userId) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("reviewId", reviewId);
-        params.put("userId", userId);
-        jdbc.update(REMOVE_DISLIKE_QUERY, params);
-        updateRating(reviewId, 1);
-        return getReviewById(reviewId)
-                .orElseThrow(() -> new NotFoundException("Отзыв с ID " + reviewId + " не найден"));
-    }
-
-    private void updateRating(Long reviewId, int delta) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("reviewId", reviewId);
-        params.put("delta", delta);
-        jdbc.update(UPDATE_RATING_QUERY, params);
+        update(UPDATE_REVIEW_DISLIKE_QUERY, params);
     }
 }

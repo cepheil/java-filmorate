@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.storage.director.DirectorRepository;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.film.FilmRepository;
 import ru.yandex.practicum.filmorate.storage.review.ReviewRepository;
+import ru.yandex.practicum.filmorate.storage.reviewLikes.ReviewLikesRepository;
 import ru.yandex.practicum.filmorate.storage.user.UserRepository;
 import ru.yandex.practicum.filmorate.storage.genre.GenreRepository;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaRepository;
@@ -25,6 +26,7 @@ public class ValidationService {
     private final GenreRepository genreRepository;
     private final MpaRepository mpaRepository;
     private final ReviewRepository reviewRepository;
+    private final ReviewLikesRepository reviewLikesRepository;
     private final DirectorRepository directorRepository;
 
     public void validateUserExists(Long userId) {
@@ -140,5 +142,17 @@ public class ValidationService {
         }
         validateUserExists(review.getUserId());
         validateFilmExists(review.getFilmId());
+    }
+
+    public void validateReviewLikesExists(Long reviewId, Long userId) {
+        if (reviewId == null) {
+            throw new ValidationException("ID отзыва не могут быть null");
+        }
+        if (userId == null) {
+            throw new ValidationException("ID пользователей не могут быть null");
+        }
+        reviewLikesRepository.getReviewLikes(reviewId, userId)
+                .orElseThrow(() -> new NotFoundException("Оценка с review_id " + reviewId + " и с user_id"
+                        + userId + " не найдена"));
     }
 }
