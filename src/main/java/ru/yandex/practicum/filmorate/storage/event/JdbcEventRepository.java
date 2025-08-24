@@ -13,7 +13,7 @@ import java.util.Map;
 
 @Repository
 public class JdbcEventRepository extends BaseNamedParameterRepository<Event> implements EventRepository {
-    private final int DEFAULT_LIMIT = 25;
+    private final static int DEFAULT_LIMIT = 25;
     private final String FIND_EVENTS_BY_USER_ID_QUERY = """
         SELECT e.event_id, e.user_id, e.entity_id, e.event_timestamp, o.name AS operation_name, et.name AS event_type_name
         FROM event AS e
