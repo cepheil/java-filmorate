@@ -424,4 +424,12 @@ public class JdbcFilmRepository extends BaseNamedParameterRepository<Film> imple
         List<Film> films = findMany(GET_COMMON_FILMS_QUERY, parameters);
         return films;
     }
+
+    @Override
+    public void deleteAllFilms() {
+        jdbc.update("DELETE FROM film_directors", new HashMap<>());
+        jdbc.update("DELETE FROM film_genre", new HashMap<>());
+        jdbc.update("DELETE FROM likes", new HashMap<>());
+        jdbc.update("DELETE FROM films", new HashMap<>());
+    }
 }

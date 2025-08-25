@@ -41,3 +41,8 @@ MERGE INTO film_genre (film_id, genre_id) VALUES
 (1, 1),
 (1, 2),
 (2, 3);
+
+-- Тестовые данные для режиссера
+MERGE INTO directors (director_id, name) VALUES
+(1, 'Director One'),
+(2, 'Director Two');

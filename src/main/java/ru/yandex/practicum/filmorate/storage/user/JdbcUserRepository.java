@@ -71,5 +71,11 @@ public class JdbcUserRepository extends BaseNamedParameterRepository<User> imple
         params.put("userId", id);
         return delete(DELETE_USER_QUERY, params);
     }
+
+    @Override
+    public void deleteAllUsers() {
+        jdbc.update("DELETE FROM friends", new HashMap<>());
+        jdbc.update("DELETE FROM users", new HashMap<>());
+    }
 }
 

@@ -38,4 +38,6 @@ public interface FilmRepository {
     Collection<Film> getRecommendedFilms(long userId);
 
     Collection<Film> getCommonFilms(long userId, long friendId);
+
+    void deleteAllFilms();
 }

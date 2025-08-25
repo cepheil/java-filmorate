@@ -15,4 +15,6 @@ public interface UserRepository {
     Optional<User> getUserById(Long id);
 
     boolean deleteUser(Long id);
+
+    void deleteAllUsers();
 }

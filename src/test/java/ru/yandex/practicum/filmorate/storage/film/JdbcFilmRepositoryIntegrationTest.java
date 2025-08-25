@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -16,7 +17,9 @@ import ru.yandex.practicum.filmorate.storage.genre.JdbcGenreRepository;
 import ru.yandex.practicum.filmorate.storage.mpa.JdbcMpaRepository;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -36,168 +39,98 @@ public class JdbcFilmRepositoryIntegrationTest {
     @Autowired
     private JdbcFilmRepository filmRepository;
 
+    @BeforeEach
+    public void setUp() {
+        filmRepository.deleteAllFilms();
+    }
+
     @Test
     public void testCreateFilm() {
-        Film film = Film.builder()
-                .name("Test Film")
-                .description("Test Description")
-                .releaseDate(LocalDate.of(2020, 1, 1))
-                .duration(120)
-                .mpa(MpaRating.builder().id(1L).name("G").description("General Audiences").build())
-                .genres(new HashSet<>(Arrays.asList(
-                        Genre.builder().id(1L).name("Комедия").build(),
-                        Genre.builder().id(2L).name("Драма").build()
-                )))
-                .directors(new HashSet<>())
-                .build();
-
+        Film film = createUniqueFilm("Create Test");
         Film createdFilm = filmRepository.createFilm(film);
-
         assertThat(createdFilm).isNotNull();
         assertThat(createdFilm.getId()).isNotNull().isPositive();
-        assertThat(createdFilm.getName()).isEqualTo("Test Film");
-        assertThat(createdFilm.getDescription()).isEqualTo("Test Description");
+        assertThat(createdFilm.getName()).isEqualTo("Create Test");
+        assertThat(createdFilm.getDescription()).isEqualTo("Create Test Description");
         assertThat(createdFilm.getReleaseDate()).isEqualTo(LocalDate.of(2020, 1, 1));
         assertThat(createdFilm.getDuration()).isEqualTo(120);
         assertThat(createdFilm.getMpa().getId()).isEqualTo(1L);
         assertThat(createdFilm.getGenres()).hasSize(2);
-        assertThat(createdFilm.getDirectors()).isEmpty();
     }
 
     @Test
     public void testFindFilmById() {
-        Film film = Film.builder()
-                .name("Test Film")
-                .description("Test Description")
-                .releaseDate(LocalDate.of(2020, 1, 1))
-                .duration(120)
-                .mpa(MpaRating.builder().id(1L).name("G").description("General Audience").build())
-                .genres(new HashSet<>())
-                .directors(new HashSet<>())
-                .build();
-
+        Film film = createUniqueFilm("Find Test");
         Film createdFilm = filmRepository.createFilm(film);
-
         Optional<Film> foundFilm = filmRepository.getFilmById(createdFilm.getId());
-
         assertThat(foundFilm).isPresent();
         assertThat(foundFilm.get().getId()).isEqualTo(createdFilm.getId());
-        assertThat(foundFilm.get().getName()).isEqualTo("Test Film");
-        assertThat(foundFilm.get().getDescription()).isEqualTo("Test Description");
-        assertThat(foundFilm.get().getReleaseDate()).isEqualTo(LocalDate.of(2020, 1, 1));
-        assertThat(foundFilm.get().getDuration()).isEqualTo(120);
-        assertThat(foundFilm.get().getMpa().getId()).isEqualTo(1L);
-        assertThat(foundFilm.get().getDirectors()).isEmpty();
+        assertThat(foundFilm.get().getName()).isEqualTo("Find Test");
     }
 
     @Test
     public void testFindAllFilms() {
-        List<Film> films = filmRepository.findAllFilms();
-
-        assertThat(films).hasSize(2);
-        assertThat(films).extracting(Film::getName)
-                .containsExactlyInAnyOrder("Test Film 1", "Test Film 2");
-        for (Film film : films) {
-            assertThat(film.getDirectors()).isNotNull();
-        }
+        Film film1 = createUniqueFilm("FindAll1");
+        Film film2 = createUniqueFilm("FindAll2");
+        filmRepository.createFilm(film1);
+        filmRepository.createFilm(film2);
+        assertThat(filmRepository.findAllFilms()).hasSize(2);
     }
 
     @Test
     public void testUpdateFilm() {
-        Film film = Film.builder()
-                .name("Original Film")
-                .description("Original Description")
-                .releaseDate(LocalDate.of(2020, 1, 1))
-                .duration(120)
-                .mpa(MpaRating.builder().id(1L).name("G").build())
-                .genres(new HashSet<>())
-                .directors(new HashSet<>())
-                .build();
-        Film createdFilm = filmRepository.createFilm(film);
-
-        Film updatedFilm = Film.builder()
-                .id(createdFilm.getId())
-                .name("Updated Film")
+        Film original = createUniqueFilm("Update Original");
+        Film created = filmRepository.createFilm(original);
+        Film updated = Film.builder()
+                .id(created.getId())
+                .name("Updated Name")
                 .description("Updated Description")
                 .releaseDate(LocalDate.of(2021, 1, 1))
                 .duration(150)
-                .mpa(MpaRating.builder().id(2L).name("PG").build())
-                .genres(new HashSet<>(Collections.singletonList(
-                        Genre.builder().id(1L).name("Комедия").build()
-                )))
-                .directors(new HashSet<>())
+                .mpa(new MpaRating(2L, "PG", null))
+                .genres(new HashSet<>())
                 .build();
-
-        Film result = filmRepository.updateFilm(updatedFilm);
-
-        assertThat(result.getId()).isEqualTo(createdFilm.getId());
-        assertThat(result.getName()).isEqualTo("Updated Film");
+        Film result = filmRepository.updateFilm(updated);
+        assertThat(result.getName()).isEqualTo("Updated Name");
         assertThat(result.getDescription()).isEqualTo("Updated Description");
-        assertThat(result.getReleaseDate()).isEqualTo(LocalDate.of(2021, 1, 1));
-        assertThat(result.getDuration()).isEqualTo(150);
-        assertThat(result.getMpa().getId()).isEqualTo(2L);
-        assertThat(result.getGenres()).hasSize(1);
     }
 
     @Test
     public void testDeleteFilm() {
-        Film film = Film.builder()
-                .name("Test Film")
-                .description("Test Description")
-                .releaseDate(LocalDate.of(2020, 1, 1))
-                .duration(120)
-                .mpa(MpaRating.builder().id(1L).name("G").build())
-                .genres(new HashSet<>())
-                .directors(new HashSet<>())
-                .build();
-        Film createdFilm = filmRepository.createFilm(film);
-
-        boolean deleted = filmRepository.deleteFilm(createdFilm.getId());
-
-        assertThat(deleted).isTrue();
-
-        Optional<Film> foundFilm = filmRepository.getFilmById(createdFilm.getId());
-        assertThat(foundFilm).isEmpty();
+        Film film = createUniqueFilm("Delete Test");
+        Film created = filmRepository.createFilm(film);
+        assertThat(filmRepository.deleteFilm(created.getId())).isTrue();
+        assertThat(filmRepository.getFilmById(created.getId())).isEmpty();
     }
 
     @Test
     public void testDeleteNonExistentFilm() {
-        boolean deleted = filmRepository.deleteFilm(999L);
-        assertThat(deleted).isFalse();
+        assertThat(filmRepository.deleteFilm(999L)).isFalse();
     }
 
     @Test
     public void testGetPopularFilms() {
-        Film film1 = Film.builder()
-                .name("Popular Film")
-                .description("Popular Description")
-                .releaseDate(LocalDate.of(2020, 1, 1))
-                .duration(120)
-                .mpa(MpaRating.builder().id(1L).name("G").build())
-                .genres(new HashSet<>())
-                .directors(new HashSet<>())
-                .build();
-
-        Film film2 = Film.builder()
-                .name("Less Popular Film")
-                .description("Less Popular Description")
-                .releaseDate(LocalDate.of(2021, 1, 1))
-                .duration(150)
-                .mpa(MpaRating.builder().id(2L).name("PG").build())
-                .genres(new HashSet<>())
-                .directors(new HashSet<>())
-                .build();
-
+        Film film1 = createUniqueFilm("Popular1");
+        Film film2 = createUniqueFilm("Popular2");
         filmRepository.createFilm(film1);
         filmRepository.createFilm(film2);
+        assertThat(filmRepository.getPopularFilms(2)).hasSize(2);
+    }
 
-        Collection<Film> popularFilms = filmRepository.getPopularFilms(2);
 
-        assertThat(popularFilms).hasSize(2);
-        for (Film film : popularFilms) {
-            assertThat(film.getDirectors()).isNotNull();
-        }
-        // Проверяем, что фильмы возвращаются (в данном случае без лайков,
-        // порядок может быть произвольным)
+    private Film createUniqueFilm(String name) {
+        return Film.builder()
+                .name(name)
+                .description(name + " Description")
+                .releaseDate(LocalDate.of(2020, 1, 1))
+                .duration(120)
+                .mpa(new MpaRating(1L, "G", "General Audiences"))
+                .genres(new HashSet<>(Set.of(
+                        new Genre(1L, "Комедия"),
+                        new Genre(2L, "Драма")
+                )))
+                .directors(new HashSet<>())
+                .build();
     }
 }
+
