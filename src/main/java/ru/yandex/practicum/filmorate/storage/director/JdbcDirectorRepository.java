@@ -52,6 +52,16 @@ public class JdbcDirectorRepository extends BaseNamedParameterRepository<Directo
             WHERE director_id = :directorId
             """;
 
+    private static final String DELETE_ALL_FILM_DIRECTORS_BY_FILM_ID_QUERY = """
+            DELETE FROM film_directors
+            WHERE film_id = :filmId;
+            """;
+
+    private static final String DELETE_ALL_FILM_DIRECTORS_BY_DIRECTOR_ID_QUERY = """
+            DELETE FROM film_directors
+            WHERE director_id = :directorId;
+            """;
+
 
     public JdbcDirectorRepository(NamedParameterJdbcOperations jdbc, RowMapper<Director> mapper) {
         super(jdbc, mapper);
@@ -102,8 +112,16 @@ public class JdbcDirectorRepository extends BaseNamedParameterRepository<Directo
     public boolean deleteDirector(Long directorId) {
         Map<String, Object> params = new HashMap<>();
         params.put("directorId", directorId);
-
+        //перед удалением режиссера удаляем связи фильм-режиссер с ним
+        delete(DELETE_ALL_FILM_DIRECTORS_BY_DIRECTOR_ID_QUERY, params);
         return delete(DELETE_DIRECTOR_QUERY, params);
+    }
+
+    @Override
+    public void deleteAllFilmDirectors(Long filmId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("filmId", filmId);
+        delete(DELETE_ALL_FILM_DIRECTORS_BY_FILM_ID_QUERY, params);
     }
 
     @Override

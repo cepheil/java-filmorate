@@ -353,6 +353,7 @@ public class JdbcFilmRepository extends BaseNamedParameterRepository<Film> imple
     }
 
     public void updateGenres(Set<Genre> genres, Long filmId) {
+        System.out.println(Arrays.toString(genres.toArray()));
         if (!genres.isEmpty()) {
             Map<String, Object> baseParams = new HashMap<>();
             baseParams.put("filmId", filmId);

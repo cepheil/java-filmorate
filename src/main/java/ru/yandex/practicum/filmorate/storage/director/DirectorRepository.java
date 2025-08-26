@@ -22,5 +22,7 @@ public interface DirectorRepository {
 
     boolean deleteDirector(Long id);
 
+    void deleteAllFilmDirectors(Long filmId);
+
     void loadDirectorsForFilms(Map<Long, Film> filmMap);
 }

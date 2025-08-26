@@ -8,10 +8,7 @@ import lombok.RequiredArgsConstructor;
 import ru.yandex.practicum.filmorate.annotation.MinReleaseDate;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @Builder(toBuilder = true)
@@ -34,7 +31,7 @@ public class Film {
     @Builder.Default
     private Set<Long> likes = new HashSet<>();
     @Builder.Default
-    private Set<Genre> genres = new HashSet<>();
+    private Set<Genre> genres = new TreeSet<>();
     @Builder.Default
     private Set<Director> directors = new HashSet<>();
     @Builder.Default
