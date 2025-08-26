@@ -1,10 +1,13 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -14,6 +17,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
 
+@Slf4j
 @Repository
 @Qualifier("filmRepository")
 public class JdbcFilmRepository extends BaseNamedParameterRepository<Film> implements FilmRepository {
@@ -257,7 +261,15 @@ public class JdbcFilmRepository extends BaseNamedParameterRepository<Film> imple
     }
 
     @Override
+    @Transactional
     public Film updateFilm(Film newFilm) {
+        log.info("Попытка обновить фильм с ID: {}", newFilm.getId());
+        Optional<Film> existingFilm = getFilmById(newFilm.getId());
+        if (existingFilm.isEmpty()) {
+            log.error("Фильм с ID {} не существует.", newFilm.getId());
+            throw new NotFoundException("Фильм с ID " + newFilm.getId() + " не существует.");
+        }
+
         Map<String, Object> params = new HashMap<>();
         params.put("name", newFilm.getName());
         params.put("description", newFilm.getDescription());
@@ -266,7 +278,14 @@ public class JdbcFilmRepository extends BaseNamedParameterRepository<Film> imple
         params.put("mpaId", newFilm.getMpa().getId());
         params.put("filmId", newFilm.getId());
 
-        update(UPDATE_FILM_QUERY, params);
+        log.debug("Параметры для обновления: {}", params);
+
+        boolean isUpdated = update(UPDATE_FILM_QUERY, params);
+        if (!isUpdated) {
+            log.error("Не удалось обновить фильм с ID {}. Возможно, данные были изменены параллельно.", newFilm.getId());
+            throw new IllegalStateException("Не удалось обновить фильм с ID " + newFilm.getId());
+        }
+
         updateGenres(newFilm.getGenres(), newFilm.getId());
         updateDirector(newFilm.getDirectors(), newFilm.getId());
         return newFilm;
