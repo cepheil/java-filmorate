@@ -101,7 +101,7 @@ public class JdbcFilmRepository extends BaseNamedParameterRepository<Film> imple
             FROM films f
             JOIN mpa_ratings m ON f.mpa_id = m.mpa_id
             WHERE LOWER(f.name) LIKE LOWER(CONCAT('%', :query, '%'))
-            ORDER BY f.film_id
+            ORDER BY f.film_id DESC
             """;
 
     private static final String SEARCH_FILMS_BY_DIRECTOR_QUERY = """
@@ -111,7 +111,7 @@ public class JdbcFilmRepository extends BaseNamedParameterRepository<Film> imple
             JOIN film_directors fd ON f.film_id = fd.film_id
             JOIN directors d ON fd.director_id = d.director_id
             WHERE LOWER(d.name) LIKE LOWER(CONCAT('%', :query, '%'))
-            ORDER BY f.film_id
+            ORDER BY f.film_id DESC
             """;
 
     private static final String SEARCH_FILMS_BY_TITLE_AND_DIRECTOR_QUERY = """
@@ -122,7 +122,7 @@ public class JdbcFilmRepository extends BaseNamedParameterRepository<Film> imple
             LEFT JOIN directors d ON fd.director_id = d.director_id
             WHERE LOWER(f.name) LIKE LOWER(CONCAT('%', :query, '%'))
                OR LOWER(d.name) LIKE LOWER(CONCAT('%', :query, '%'))
-            ORDER BY f.film_id
+            ORDER BY f.film_id DESC
             """;
 
 
