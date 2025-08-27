@@ -52,6 +52,16 @@ public class JdbcReviewRepository extends BaseNamedParameterRepository<Review> i
             WHERE review_id = :reviewId
             """;
 
+    private static final String UPDATE_USEFUL_QUERY = """
+            UPDATE reviews
+            SET useful = (
+                SELECT COALESCE(SUM(CASE WHEN is_like THEN 1 ELSE -1 END), 0)
+                FROM review_likes
+                WHERE review_id = :reviewId
+            )
+            WHERE review_id = :reviewId
+            """;
+
     public JdbcReviewRepository(NamedParameterJdbcOperations jdbc, RowMapper<Review> mapper) {
         super(jdbc, mapper);
     }
@@ -74,6 +84,7 @@ public class JdbcReviewRepository extends BaseNamedParameterRepository<Review> i
 
         long id = insert(INSERT_REVIEW_QUERY, params);
         review.setReviewId(id);
+        review.setUseful(0);
         return review;
     }
 
@@ -99,6 +110,13 @@ public class JdbcReviewRepository extends BaseNamedParameterRepository<Review> i
         newReview.setUserId(existingReview.getUserId());
         newReview.setFilmId(existingReview.getFilmId());
         return newReview;
+    }
+
+    @Override
+    public void updateUseful(Long reviewId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("reviewId", reviewId);
+        update(UPDATE_USEFUL_QUERY, params);
     }
 
     @Override

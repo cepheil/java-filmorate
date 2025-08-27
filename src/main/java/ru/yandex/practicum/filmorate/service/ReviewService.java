@@ -80,12 +80,13 @@ public class ReviewService {
                 log.trace("На отзыве {} стоит дизлайк от пользователя {}. Ставим лайк", reviewId, userId);
                 reviewLikesRepository.deleteReviewLike(reviewId, userId);
                 reviewRepository.addLike(reviewId, userId);
-
+                reviewRepository.updateUseful(reviewId);
             }
         }
         reviewLikesRepository.addReviewLike(reviewId, userId, Boolean.TRUE);
         log.info("Пользователь {} лайкнул отзыв {}", userId, reviewId);
         reviewRepository.addLike(reviewId, userId);
+        reviewRepository.updateUseful(reviewId);
     }
 
     public void addDislike(Long reviewId, Long userId) {
@@ -100,12 +101,13 @@ public class ReviewService {
                 log.trace("На отзыве {} стоит лайк от пользователя {}. Ставим дизлайк", reviewId, userId);
                 reviewLikesRepository.deleteReviewLike(reviewId, userId);
                 reviewRepository.addDislike(reviewId, userId);
-
+                reviewRepository.updateUseful(reviewId);
             }
         }
         reviewLikesRepository.addReviewLike(reviewId, userId, Boolean.FALSE);
         log.info("Пользователь {} дизлайкнул отзыв {}", userId, reviewId);
         reviewRepository.addDislike(reviewId, userId);
+        reviewRepository.updateUseful(reviewId);
     }
 
     public void deleteLike(Long reviewId, Long userId) {
@@ -117,6 +119,7 @@ public class ReviewService {
             if (rLikes.get().getIsLike().equals(Boolean.TRUE)) {
                 log.trace("Удаляем лайк отзыву {} от пользователя {}", reviewId, userId);
                 reviewRepository.addDislike(reviewId, userId);
+                reviewRepository.updateUseful(reviewId);
             }
         }
     }
@@ -130,6 +133,7 @@ public class ReviewService {
             if (rLikes.get().getIsLike().equals(Boolean.FALSE)) {
                 log.trace("Удаляем дизлайк отзыву {} от пользователя {}", reviewId, userId);
                 reviewRepository.addLike(reviewId, userId);
+                reviewRepository.updateUseful(reviewId);
             }
         }
     }

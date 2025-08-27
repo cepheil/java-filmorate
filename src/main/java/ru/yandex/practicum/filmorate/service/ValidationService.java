@@ -137,22 +137,16 @@ public class ValidationService {
         if (review == null) {
             throw new ValidationException("Отзыв не может быть null");
         }
+        if (review.getContent() == null || review.getContent().isBlank()) {
+            throw new ValidationException("Содержание отзыва не может быть пустым");
+        }
+        if (review.getIsPositive() == null) {
+            throw new ValidationException("Тип отзыва (положительный/отрицательный) должен быть указан");
+        }
         if (review.getUseful() == null) {
             review.setUseful(0);
         }
         validateUserExists(review.getUserId());
         validateFilmExists(review.getFilmId());
-    }
-
-    public void validateReviewLikesExists(Long reviewId, Long userId) {
-        if (reviewId == null) {
-            throw new ValidationException("ID отзыва не могут быть null");
-        }
-        if (userId == null) {
-            throw new ValidationException("ID пользователей не могут быть null");
-        }
-        reviewLikesRepository.getReviewLikes(reviewId, userId)
-                .orElseThrow(() -> new NotFoundException("Оценка с review_id " + reviewId + " и с user_id"
-                        + userId + " не найдена"));
     }
 }
