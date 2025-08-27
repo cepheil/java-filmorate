@@ -19,7 +19,7 @@ public class JdbcReviewRepository extends BaseNamedParameterRepository<Review> i
 
     private static final String UPDATE_REVIEW_QUERY = """
             UPDATE reviews
-            SET content = :content, is_positive = :isPositive, user_id = :userId, film_id = :filmId, useful = :useful
+            SET content = :content, is_positive = :isPositive, useful = :useful
             WHERE review_id = :reviewId;
             """;
 
@@ -79,15 +79,25 @@ public class JdbcReviewRepository extends BaseNamedParameterRepository<Review> i
 
     @Override
     public Review updateReview(Review newReview) {
+        Optional<Review> existingReviewOpt = getReviewById(newReview.getReviewId());
+        if (existingReviewOpt.isEmpty()) {
+            throw new RuntimeException("Review not found with id: " + newReview.getReviewId());
+        }
+
+        Review existingReview = existingReviewOpt.get();
+
         Map<String, Object> params = new HashMap<>();
-        params.put("reviewId", newReview.getReviewId());
         params.put("content", newReview.getContent());
         params.put("isPositive", newReview.getIsPositive());
-        params.put("userId", newReview.getUserId());
-        params.put("filmId", newReview.getFilmId());
         params.put("useful", newReview.getUseful());
+        params.put("userId", existingReview.getUserId());
+        params.put("filmId", existingReview.getFilmId());
+        params.put("reviewId", newReview.getReviewId());
 
         update(UPDATE_REVIEW_QUERY, params);
+
+        newReview.setUserId(existingReview.getUserId());
+        newReview.setFilmId(existingReview.getFilmId());
         return newReview;
     }
 
