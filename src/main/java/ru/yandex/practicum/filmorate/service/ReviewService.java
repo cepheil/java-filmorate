@@ -35,7 +35,8 @@ public class ReviewService {
         log.info("Попытка обновить отзыв {}", review.getReviewId());
         validationService.validateReview(review);
         validationService.validateReviewExists(review.getReviewId());
-        eventService.addEvent(review.getUserId(), review.getReviewId(), "REVIEW", "UPDATE");
+        Review oldReview = reviewRepository.getReviewById(review.getReviewId()).get();
+        eventService.addEvent(oldReview.getUserId(), oldReview.getReviewId(), "REVIEW", "UPDATE");
         return reviewRepository.updateReview(review);
     }
 
