@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.model.ReviewLikes;
 import ru.yandex.practicum.filmorate.storage.review.ReviewRepository;
@@ -51,6 +52,14 @@ public class ReviewService {
         validationService.validateReviewExists(reviewId);
         return reviewRepository.getReviewById(reviewId)
                 .orElseThrow(() -> new NotFoundException("Отзыв с ID " + reviewId + " не найден"));
+    }
+
+    public List<Review> getAllReviews(int count) {
+        log.info("Попытка получения {} отзывов", count);
+        if (count <= 0) {
+            throw new ValidationException("Число отзывов должно быть положительным");
+        }
+        return reviewRepository.getAllReviews(count);
     }
 
     public List<Review> getReviewsByFilmId(Long filmId, int count) {

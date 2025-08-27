@@ -57,6 +57,13 @@ public class JdbcReviewRepository extends BaseNamedParameterRepository<Review> i
     }
 
     @Override
+    public List<Review> getAllReviews(int count) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("count", count);
+        return findMany(FIND_ALL_REVIEWS_QUERY, params);
+    }
+
+    @Override
     public Review createReview(Review review) {
         Map<String, Object> params = new HashMap<>();
         params.put("content", review.getContent());
@@ -71,17 +78,17 @@ public class JdbcReviewRepository extends BaseNamedParameterRepository<Review> i
     }
 
     @Override
-    public Review updateReview(Review review) {
+    public Review updateReview(Review newReview) {
         Map<String, Object> params = new HashMap<>();
-        params.put("reviewId", review.getReviewId());
-        params.put("content", review.getContent());
-        params.put("isPositive", review.getIsPositive());
-        params.put("userId", review.getUserId());
-        params.put("filmId", review.getFilmId());
-        params.put("useful", review.getUseful());
+        params.put("reviewId", newReview.getReviewId());
+        params.put("content", newReview.getContent());
+        params.put("isPositive", newReview.getIsPositive());
+        params.put("userId", newReview.getUserId());
+        params.put("filmId", newReview.getFilmId());
+        params.put("useful", newReview.getUseful());
 
         update(UPDATE_REVIEW_QUERY, params);
-        return review;
+        return newReview;
     }
 
     @Override

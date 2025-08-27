@@ -20,4 +20,6 @@ public interface ReviewRepository {
     void addLike(Long reviewId, Long userId);
 
     void addDislike(Long reviewId, Long userId);
+
+    List<Review> getAllReviews(int count);
 }

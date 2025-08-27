@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS reviews (
 
 CREATE TABLE IF NOT EXISTS review_likes (
     review_id BIGINT REFERENCES reviews (review_id) ON DELETE CASCADE,
-    user_id BIGINT REFERENCES users (user_id) ON DELETE CASCADE,
+    user_id BIGINT REFERENCES users (user_id),
     is_like boolean default true,
     primary key (review_id, user_id)
 );
