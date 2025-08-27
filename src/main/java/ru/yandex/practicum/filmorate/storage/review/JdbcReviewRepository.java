@@ -19,7 +19,7 @@ public class JdbcReviewRepository extends BaseNamedParameterRepository<Review> i
 
     private static final String UPDATE_REVIEW_QUERY = """
             UPDATE reviews
-            SET content = :content, is_positive = :isPositive, useful = :useful
+            SET content = :content, is_positive = :isPositive
             WHERE review_id = :reviewId;
             """;
 
@@ -100,7 +100,7 @@ public class JdbcReviewRepository extends BaseNamedParameterRepository<Review> i
         Map<String, Object> params = new HashMap<>();
         params.put("content", newReview.getContent());
         params.put("isPositive", newReview.getIsPositive());
-        params.put("useful", newReview.getUseful());
+        params.put("useful", existingReview.getUseful());
         params.put("userId", existingReview.getUserId());
         params.put("filmId", existingReview.getFilmId());
         params.put("reviewId", newReview.getReviewId());
@@ -109,6 +109,7 @@ public class JdbcReviewRepository extends BaseNamedParameterRepository<Review> i
 
         newReview.setUserId(existingReview.getUserId());
         newReview.setFilmId(existingReview.getFilmId());
+        newReview.setUseful(existingReview.getUseful());
         return newReview;
     }
 
