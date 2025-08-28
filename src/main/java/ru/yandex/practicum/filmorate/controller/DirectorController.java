@@ -17,34 +17,63 @@ import java.util.Collection;
 public class DirectorController {
     private final DirectorService directorService;
 
-    //GET /directors
+    /**
+     * Получить список всех режиссёров.
+     *
+     * @return коллекция всех режиссёров
+     */
     @GetMapping
     public Collection<Director> findAllDirectors() {
+        log.info("Получен список всех режиссёров.");
         return directorService.findAllDirectors();
     }
 
-    //GET /directors/{id}
+
+    /**
+     * Получить режиссёра по ID.
+     *
+     * @param id идентификатор режиссёра
+     * @return режиссёр с указанным ID
+     * NotFoundException если режиссёр не найден
+     */
     @GetMapping("/{id}")
     public Director findDirectorById(@PathVariable Long id) {
+        log.info("Получен запрос на получение режиссёра с ID: {}", id);
         return directorService.findDirectorById(id);
     }
 
-    //POST /directors
+    /**
+     * Создать нового режиссёра.
+     *
+     * @param director объект режиссёра для создания
+     * @return созданный режиссёр с присвоенным ID
+     */
     @PostMapping
     public Director createDirector(@Valid @RequestBody Director director) {
+        log.info("Получен запрос на создание режиссёра: {}", director.getName());
         return directorService.createDirector(director);
     }
 
-    //PUT /directors
+    /**
+     * Обновить существующего режиссёра.
+     *
+     * @param newDirector объект режиссёра с обновлёнными данными
+     * @return обновлённый режиссёр
+     */
     @PutMapping
     public Director updateDirector(@Valid @RequestBody Director newDirector) {
+        log.info("Получен запрос на обновление режиссёра с ID: {}", newDirector.getId());
         return directorService.updateDirector(newDirector);
     }
 
-    // DELETE /directors/{id}
+    /**
+     * Удалить режиссёра по ID.
+     *
+     * @param id идентификатор режиссёра для удаления
+     */
     @DeleteMapping("/{id}")
     public void deleteDirector(@PathVariable Long id) {
+        log.info("Получен запрос на удаление режиссёра с ID: {}", id);
         directorService.deleteDirector(id);
     }
-
 }

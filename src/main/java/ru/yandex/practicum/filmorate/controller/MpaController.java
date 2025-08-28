@@ -18,12 +18,24 @@ import java.util.Collection;
 public class MpaController {
     private final MpaRatingService mpaRatingService;
 
+    /**
+     * Получить список всех рейтингов MPA.
+     *
+     * @return коллекция всех рейтингов MPA
+     */
     @GetMapping
     public Collection<MpaRating> getAllMpaRatings() {
         log.info("Попытка получения всех рейтингов MPA");
         return mpaRatingService.findAllMpa();
     }
 
+    /**
+     * Получить рейтинг MPA по ID.
+     *
+     * @param id идентификатор рейтинга MPA
+     * @return рейтинг MPA с указанным ID
+     * NotFoundException если рейтинг не найден
+     */
     @GetMapping("/{id}")
     public MpaRating getMpaById(@PathVariable Long id) {
         log.info("Попытка получения рейтинга MPA по ID: {}", id);

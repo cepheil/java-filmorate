@@ -18,12 +18,24 @@ import java.util.Collection;
 public class GenreController {
     private final GenreService genreService;
 
+    /**
+     * Получить список всех жанров.
+     *
+     * @return коллекция всех жанров
+     */
     @GetMapping
     public Collection<Genre> getAllGenres() {
         log.info("Попытка получения всех жанров");
         return genreService.findAllGenres();
     }
 
+    /**
+     * Получить жанр по ID.
+     *
+     * @param id идентификатор жанра
+     * @return жанр с указанным ID
+     * NotFoundException если жанр не найден
+     */
     @GetMapping("/{id}")
     public Genre getGenreById(@PathVariable Long id) {
         log.info("Попытка получения жанра по ID: {}", id);

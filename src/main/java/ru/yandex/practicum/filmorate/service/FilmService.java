@@ -69,11 +69,12 @@ public class FilmService {
         log.info("Попытка создания фильма: {}", film.getName());
         validationService.validateFilm(film);
         Film createdFilm = filmRepository.createFilm(film);
-        //костыль на сортировку жанров в фильме
-        List<Genre> test = new ArrayList<>(film.getGenres());
-        test.sort(Comparator.comparingLong(Genre::getId));
-        film.setGenres(new TreeSet<>(test));
-
+        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
+            film.setGenres(film.getGenres()
+                    .stream()
+                    .sorted(Comparator.comparingLong(Genre::getId))
+                    .collect(Collectors.toCollection(TreeSet::new)));
+        }
         log.info("Создан фильм с ID: {}", createdFilm.getId());
         return createdFilm;
     }

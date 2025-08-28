@@ -1,4 +1,3 @@
-// WELCOME COMRADES
 package ru.yandex.practicum.filmorate;
 
 import org.springframework.boot.SpringApplication;
