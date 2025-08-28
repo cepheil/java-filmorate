@@ -24,8 +24,4 @@ public class GenreService {
     public List<Genre> findAllGenres() {
         return genreRepository.findAllGenres();
     }
-
-    public Set<Genre> findGenreByFilmId(Long filmId) {
-        return genreRepository.findGenreByFilmId(filmId);
-    }
 }

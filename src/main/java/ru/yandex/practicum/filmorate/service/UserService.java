@@ -86,7 +86,6 @@ public class UserService {
         validationService.validateUserExists(userId);
         userRepository.deleteUser(userId);
         friendService.removeAllFriendsByUserId(userId);
-        //так как не оговорено особо, решил, что при удалении пользователя его лайки нужно удалять
         likeService.removeLikesByUserId(userId);
         log.info("Пользователь {}, а также связанные с ним записи о лайках и друзьях удалены", userId);
     }

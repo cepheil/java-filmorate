@@ -23,14 +23,12 @@ public class DirectorService {
         return directorRepository.findAllDirectors();
     }
 
-
     public Director findDirectorById(Long directorId) {
         log.info("Попытка получения режиссера по ID"); //{}, directorId лучше не использовать
         validationService.validateDirectorExists(directorId);
         return directorRepository.findDirectorById(directorId)
                 .orElseThrow(() -> new NotFoundException("Режиссер с ID " + directorId + " не найден"));
     }
-
 
     public Director createDirector(Director director) {
         log.info("Попытка создания режиссера: {}", director.getName());
@@ -39,7 +37,6 @@ public class DirectorService {
         return createdDirector;
     }
 
-
     public Director updateDirector(Director newDirector) {
         log.info("Попытка обновления режиссера");
         validationService.validateDirectorExists(newDirector.getId());
@@ -47,7 +44,6 @@ public class DirectorService {
         log.info("Режиссер с ID {} обновлен", newDirector.getId());
         return updatedDirector;
     }
-
 
     public void deleteDirector(Long directorId) {
         log.info("Попытка удаления режиссера");
@@ -58,13 +54,4 @@ public class DirectorService {
         }
         log.info("Режиссер  с ID {} успешно удален", directorId);
     }
-
-    // ??
-    public Set<Director> findDirectorByFilmId(Long filmId) {
-        log.info("Попытка получения режиссеров по ID фильма");
-        validationService.validateFilmExists(filmId);
-        return directorRepository.findDirectorByFilmId(filmId);
-    }
-
-
 }

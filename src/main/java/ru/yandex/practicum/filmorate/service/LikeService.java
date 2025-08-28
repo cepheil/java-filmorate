@@ -12,16 +12,13 @@ public class LikeService {
     private final ValidationService validationService;
 
     public void addLike(Long filmId, Long userId) {
-        // -8 зафейленных тестов. тест add-like Film id=3 with director add Like ожидает ответ 200,
-        // возможно можно заменить на проверку существования лайка, но если он существует мы не должны отправлять 200
         likeRepository.removeLike(filmId, userId);
-
         likeRepository.addLike(filmId, userId);
         eventService.addEvent(userId, filmId, "LIKE", "ADD");
     }
 
     public void removeLike(Long filmId, Long userId) {
-        validationService.validateFilmExists(filmId); //проверка на удаление лайка несуществующего пользователя
+        validationService.validateFilmExists(filmId);
         validationService.validateUserExists(userId);
         likeRepository.removeLike(filmId, userId);
         eventService.addEvent(userId, filmId, "LIKE", "REMOVE");

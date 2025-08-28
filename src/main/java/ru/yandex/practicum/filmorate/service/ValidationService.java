@@ -26,7 +26,6 @@ public class ValidationService {
     private final GenreRepository genreRepository;
     private final MpaRepository mpaRepository;
     private final ReviewRepository reviewRepository;
-    private final ReviewLikesRepository reviewLikesRepository;
     private final DirectorRepository directorRepository;
 
     public void validateUserExists(Long userId) {

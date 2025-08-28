@@ -204,7 +204,6 @@ public class FilmService {
     }
 
     public Collection<Film> getCommonFilms(long userId, long friendId) {
-        User friend = userService.getUserById(friendId);
         Collection<Film> filmList = filmRepository.getCommonFilms(userId, friendId);
         loadAdditionalData(new ArrayList<>(filmList));
         log.info("Отгрузил {} общих фильмов для пользователей {} и {}", filmList.size(),
