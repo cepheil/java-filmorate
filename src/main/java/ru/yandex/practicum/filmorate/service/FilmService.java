@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Review;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.director.DirectorRepository;
 import ru.yandex.practicum.filmorate.storage.film.FilmRepository;
 import ru.yandex.practicum.filmorate.storage.genre.GenreRepository;
@@ -29,7 +28,6 @@ public class FilmService {
     private final LikeService likeService;
     private final DirectorRepository directorRepository;
     private final GenreRepository genreRepository;
-    private final UserService userService;
     private final ReviewRepository reviewRepository;
 
     public Collection<Film> findAllFilms() {

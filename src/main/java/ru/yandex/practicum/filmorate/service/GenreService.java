@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.genre.GenreRepository;
 
 import java.util.List;
-import java.util.Set;
 
 @Slf4j
 @Service
