@@ -62,6 +62,13 @@ public class JdbcDirectorRepository extends BaseNamedParameterRepository<Directo
             WHERE director_id = :directorId;
             """;
 
+    private static final String LOAD_DIRECTORS_FOR_FILMS_QUERY = """
+            SELECT fd.film_id, d.director_id, d.name
+            FROM film_directors AS fd
+            JOIN directors AS d ON fd.director_id = d.director_id
+            WHERE fd.film_id IN (:filmIds)
+            """;
+
 
     public JdbcDirectorRepository(NamedParameterJdbcOperations jdbc, RowMapper<Director> mapper) {
         super(jdbc, mapper);
@@ -92,7 +99,6 @@ public class JdbcDirectorRepository extends BaseNamedParameterRepository<Directo
     public Director createDirector(Director director) {
         Map<String, Object> params = new HashMap<>();
         params.put("name", director.getName());
-
         long id = insert(INSERT_DIRECTOR_QUERY, params);
         director.setId(id);
         return director;
@@ -103,7 +109,6 @@ public class JdbcDirectorRepository extends BaseNamedParameterRepository<Directo
         Map<String, Object> params = new HashMap<>();
         params.put("name", director.getName());
         params.put("directorId", director.getId());
-
         update(UPDATE_DIRECTOR_QUERY, params);
         return director;
     }
@@ -112,7 +117,6 @@ public class JdbcDirectorRepository extends BaseNamedParameterRepository<Directo
     public boolean deleteDirector(Long directorId) {
         Map<String, Object> params = new HashMap<>();
         params.put("directorId", directorId);
-        //перед удалением режиссера удаляем связи фильм-режиссер с ним
         delete(DELETE_ALL_FILM_DIRECTORS_BY_DIRECTOR_ID_QUERY, params);
         return delete(DELETE_DIRECTOR_QUERY, params);
     }
@@ -129,17 +133,10 @@ public class JdbcDirectorRepository extends BaseNamedParameterRepository<Directo
         if (filmMap.isEmpty()) {
             return;
         }
-        String sql = """
-                SELECT fd.film_id, d.director_id, d.name
-                FROM film_directors AS fd
-                JOIN directors AS d ON fd.director_id = d.director_id
-                WHERE fd.film_id IN (:filmIds)
-                """;
-
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("filmIds", filmMap.keySet());
 
-        jdbc.query(sql, parameters, rs -> {
+        jdbc.query(LOAD_DIRECTORS_FOR_FILMS_QUERY, parameters, rs -> {
             Film film = filmMap.get(rs.getLong("film_id"));
             if (film.getDirectors() == null) {
                 film.setDirectors(new HashSet<>());
@@ -150,6 +147,4 @@ public class JdbcDirectorRepository extends BaseNamedParameterRepository<Directo
         });
 
     }
-
-
 }
