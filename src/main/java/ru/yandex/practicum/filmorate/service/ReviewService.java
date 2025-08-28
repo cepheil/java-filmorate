@@ -75,11 +75,10 @@ public class ReviewService {
         Optional<ReviewLikes> rLikes = reviewLikesRepository.getReviewLikes(reviewId, userId);
         if (rLikes.isPresent()) {
             if (rLikes.get().getIsLike().equals(Boolean.TRUE)) {
-                log.trace("Лайк отзыву {} от пользователя {} уже существует", reviewId, userId);
+                log.info("Лайк отзыву {} от пользователя {} уже существует", reviewId, userId);
                 return;
             } else {
-                log.trace("На отзыве {} стоит дизлайк от пользователя {}. Ставим лайк", reviewId, userId);
-                reviewLikesRepository.deleteReviewLike(reviewId, userId);
+                log.info("На отзыве {} стоит дизлайк от пользователя {}. Ставим лайк", reviewId, userId);
                 reviewRepository.addLike(reviewId, userId);
                 reviewRepository.updateUseful(reviewId);
             }
@@ -96,11 +95,10 @@ public class ReviewService {
         Optional<ReviewLikes> rLikes = reviewLikesRepository.getReviewLikes(reviewId, userId);
         if (rLikes.isPresent()) {
             if (rLikes.get().getIsLike().equals(Boolean.FALSE)) {
-                log.trace("Дизайк отзыву {} от пользователя {} уже существует", reviewId, userId);
+                log.info("Дизайк отзыву {} от пользователя {} уже существует", reviewId, userId);
                 return;
             } else {
-                log.trace("На отзыве {} стоит лайк от пользователя {}. Ставим дизлайк", reviewId, userId);
-                reviewLikesRepository.deleteReviewLike(reviewId, userId);
+                log.info("На отзыве {} стоит лайк от пользователя {}. Ставим дизлайк", reviewId, userId);
                 reviewRepository.addDislike(reviewId, userId);
                 reviewRepository.updateUseful(reviewId);
             }
@@ -118,7 +116,7 @@ public class ReviewService {
         if (rLikes.isPresent()) {
             reviewLikesRepository.deleteReviewLike(reviewId, userId);
             if (rLikes.get().getIsLike().equals(Boolean.TRUE)) {
-                log.trace("Удаляем лайк отзыву {} от пользователя {}", reviewId, userId);
+                log.info("Удаляем лайк отзыву {} от пользователя {}", reviewId, userId);
                 reviewRepository.addDislike(reviewId, userId);
                 reviewRepository.updateUseful(reviewId);
             }
@@ -132,7 +130,7 @@ public class ReviewService {
         if (rLikes.isPresent()) {
             reviewLikesRepository.deleteReviewLike(reviewId, userId);
             if (rLikes.get().getIsLike().equals(Boolean.FALSE)) {
-                log.trace("Удаляем дизлайк отзыву {} от пользователя {}", reviewId, userId);
+                log.info("Удаляем дизлайк отзыву {} от пользователя {}", reviewId, userId);
                 reviewRepository.addLike(reviewId, userId);
                 reviewRepository.updateUseful(reviewId);
             }
